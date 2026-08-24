@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Missão Clima — Enchentes e deslizamentos</title>
+<meta name="description" content="Quiz educativo sobre enchentes e deslizamentos, do MIVA — Memorial das Inundações nos Vales.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<main id="quiz">
+
+  <!-- 1. Abertura — reproduz a capa do slide 1 -->
+  <section id="tela-abertura" class="tela" hidden aria-labelledby="titulo-abertura">
+    <h1 id="titulo-abertura" class="oculto-visual">
+      Missão Clima — Enchentes e deslizamentos
+    </h1>
+    <img class="capa" src="assets/capa.webp" width="1402" height="854"
+         alt="Missão Clima, enchentes e deslizamentos. Dois estudantes observam uma
+              rua alagada de um lado e um deslizamento de encosta do outro. O clima
+              muda, os riscos aumentam, o conhecimento te prepara.">
+    <div class="abertura__acao">
+      <p class="abertura__resumo">
+        São <strong>15 perguntas</strong>, em 3 blocos de 5: alertas, preparação
+        e o que fazer durante o evento climático. Sem tempo e sem desconto por
+        erro — a ideia é aprender.
+      </p>
+      <button type="button" id="btn-comecar" class="botao">Aceite essa missão!</button>
+    </div>
+  </section>
+
+  <!-- 2. Transição de módulo — reproduz os divisores dos slides 2, 14 e 31 -->
+  <section id="tela-transicao" class="tela" hidden aria-labelledby="transicao-titulo">
+    <p class="transicao__etapa">
+      Bloco <span id="transicao-numero">1</span> de 3
+    </p>
+    <h2 class="transicao__titulo" id="transicao-titulo"></h2>
+    <p class="transicao__frase" id="transicao-frase"></p>
+    <button type="button" id="btn-iniciar-modulo" class="botao">Começar o bloco</button>
+  </section>
+
+  <!-- 3. Pergunta -->
+  <section id="tela-pergunta" class="tela" hidden aria-labelledby="enunciado">
+    <div class="palco">
+      <div class="card">
+        <img class="card__selo" src="assets/selo-miva.webp" width="426" height="378"
+             alt="MIVA — Memorial das Inundações nos Vales">
+        <h2 class="card__enunciado" id="enunciado"></h2>
+        <ul class="alternativas" id="alternativas"></ul>
+        <p class="veredito" id="veredito" hidden></p>
+        <p class="explicacao" id="explicacao" hidden></p>
+        <div class="card__acao">
+          <button type="button" id="btn-avancar" class="botao" hidden>Avançar</button>
+        </div>
+      </div>
+    </div>
+    <p class="rodape">
+      <span class="rodape__lema">Conhecimento salva vidas!</span>
+      <span class="rodape__progresso" id="progresso"></span>
+    </p>
+  </section>
+
+  <!-- 4. Resultado do módulo -->
+  <section id="tela-modulo" class="tela" hidden aria-labelledby="modulo-titulo">
+    <h2 class="resultado__titulo" id="modulo-titulo"></h2>
+    <p class="placar">
+      <span id="modulo-acertos">0</span><span class="placar__de"> de 5</span>
+    </p>
+    <p class="resultado__frase" id="modulo-frase"></p>
+    <button type="button" id="btn-seguir" class="botao">Seguir</button>
+  </section>
+
+  <!-- 5. Resultado final -->
+  <section id="tela-final" class="tela" hidden aria-labelledby="final-titulo">
+    <h2 class="resultado__titulo" id="final-titulo">Missão concluída!</h2>
+    <p class="placar">
+      <span id="final-acertos">0</span><span class="placar__de"> de 15</span>
+    </p>
+    <p class="resultado__frase" id="final-frase"></p>
+    <ul class="retomada" id="retomada"></ul>
+    <button type="button" id="btn-jogar-de-novo" class="botao">
+      Jogar de novo com perguntas novas
+    </button>
+  </section>
+
+  <!-- Carregando / erro -->
+  <section id="tela-carregando" class="tela">
+    <p class="aviso" id="aviso-carregando">Carregando as perguntas…</p>
+  </section>
+
+</main>
+
+<!-- Região viva: anuncia acerto/erro e troca de tela para leitor de tela. -->
+<p id="anuncio" class="oculto-visual" role="status" aria-live="polite"></p>
+
+<script src="quiz.js"></script>
+</body>
+</html>

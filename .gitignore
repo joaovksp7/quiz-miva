@@ -1,0 +1,5 @@
+# Nada aqui além do que o projeto realmente precisa versionar.
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
