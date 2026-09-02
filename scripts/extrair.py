@@ -24,6 +24,10 @@ from pptx.util import Emu
 RAIZ = Path(__file__).resolve().parent.parent
 PPTX = RAIZ / "fonte" / "Pergunta aqui.pptx"
 SAIDA = RAIZ / "perguntas.json"
+# Espelho do JSON como script. Existe só para o index.html abrir por duplo
+# clique: fetch de file:// morre no CORS, <script src> não. Gerado junto, na
+# mesma rodada — os dois nunca saem daqui diferentes.
+SAIDA_JS = RAIZ / "perguntas.js"
 CORRECOES = RAIZ / "correcoes.json"
 
 # Os divisores marcam onde cada eixo começa. Detectados pelo texto, não pela
@@ -563,11 +567,17 @@ def main():
         if mantidas:
             print(f"preservadas {mantidas} explicações já existentes")
 
-    SAIDA.write_text(
-        json.dumps(perguntas, ensure_ascii=False, indent=2) + "\n",
+    corpo = json.dumps(perguntas, ensure_ascii=False, indent=2)
+    SAIDA.write_text(corpo + "\n", encoding="utf-8")
+    print(f"escrito {SAIDA.relative_to(RAIZ)} com {len(perguntas)} perguntas")
+
+    SAIDA_JS.write_text(
+        "/* GERADO por scripts/extrair.py — não editar à mão.\n"
+        "   Cópia do perguntas.json para o index.html abrir por duplo clique. */\n"
+        "window.PERGUNTAS = " + corpo + ";\n",
         encoding="utf-8",
     )
-    print(f"escrito {SAIDA.relative_to(RAIZ)} com {len(perguntas)} perguntas")
+    print(f"escrito {SAIDA_JS.relative_to(RAIZ)} (espelho para file://)")
 
 
 if __name__ == "__main__":
