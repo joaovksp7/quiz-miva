@@ -45,47 +45,11 @@
   --card-alt: 55.47%;
 }
 
-/* --- fontes: self-hosted, nenhuma requisição externa em runtime --------- */
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('assets/fontes/poppins-400-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('assets/fontes/poppins-400-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+1E00-1E9F, U+2C60-2C7F;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('assets/fontes/poppins-700-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
-                 U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191,
-                 U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Poppins';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('assets/fontes/poppins-700-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+1E00-1E9F, U+2C60-2C7F;
-}
+/* --- fontes ------------------------------------------------------------- */
+/* Os @font-face da Poppins moraram aqui até virarem base64 no fontes.css,
+   gerado por scripts/empacotar.py e carregado antes deste arquivo. O motivo é
+   o file://: o Chrome recusa uma fonte lida do disco por CORS, mas aceita
+   data: URI. Os .woff2 seguem em assets/fontes/ como fonte do empacotar.py. */
 
 /* --- base -------------------------------------------------------------- */
 
@@ -176,15 +140,30 @@ img { max-width: 100%; height: auto; display: block; }
 
 /* --- 1. abertura ------------------------------------------------------- */
 
+/* No celular a capa fica inteira, com a faixa navy embaixo — recortar não
+   serve aqui, porque a arte é 1,64:1 e a tela em retrato é 0,46:1: sobraria
+   uma tirinha central de 28% da largura. O tela-cheia da abertura mora na
+   media query de desktop, lá embaixo.
+
+   O max-height é o que faltava antes: limitar só a largura travava a altura
+   da capa em 670px e, com a faixa embaixo, a abertura dava 882px fixos em
+   qualquer janela — passava da dobra em tudo que não fosse 1080p e escondia
+   o botão de começar. O 'width: auto' é o que faz o navegador reduzir as
+   duas dimensões mantendo a proporção. */
 #tela-abertura {
   justify-content: flex-start;
   gap: 0;
   padding: 0;
 }
 
+/* O max() é um piso: num celular deitado a janela é tão baixa que o desconto
+   dos 15rem sozinho reduzia a capa a uns 20px de altura. Abaixo desse piso é
+   melhor deixar a abertura rolar — no celular rolar é gesto natural. */
 .capa {
-  width: 100%;
-  max-width: 1100px;
+  width: auto;
+  max-width: min(100%, 1100px);
+  max-height: max(180px, calc(100vh - 15rem));   /* sem dvh, ainda cabe */
+  max-height: max(180px, calc(100dvh - 15rem));
   margin: 0 auto;
 }
 
@@ -287,6 +266,12 @@ img { max-width: 100%; height: auto; display: block; }
 /* O slide 16 é verdadeiro/falso e tem só 2 opções, e a extração ainda pode
    devolver 3 em algum slide. Grade fixa em 2x2 quebraria nesses casos. */
 
+/* As alternativas têm textos de comprimentos bem diferentes, e sem isto cada
+   caixa ficava com a altura do próprio texto — quatro tamanhos diferentes na
+   mesma pergunta. São dois ajustes, um para cada eixo do desalinhamento:
+   o 'grid-auto-rows: 1fr' iguala as linhas entre si, e o 'display: grid' no
+   <li> faz o botão esticar até preencher a célula, igualando as duas caixas
+   de uma mesma linha. */
 .alternativas {
   list-style: none;
   margin: 0;
@@ -294,7 +279,10 @@ img { max-width: 100%; height: auto; display: block; }
   display: grid;
   gap: 0.7rem;
   grid-template-columns: 1fr;
+  grid-auto-rows: 1fr;
 }
+
+.alternativas li { display: grid; }
 
 .alternativa {
   width: 100%;
@@ -485,28 +473,109 @@ img { max-width: 100%; height: auto; display: block; }
 @media (min-width: 900px) {
   .tela { padding: 2rem; }
 
+  /* --- abertura em tela cheia ------------------------------------------ */
+  /* A capa preenche a janela e o texto com o botão flutua por cima. */
+
+  #tela-abertura {
+    position: relative;
+    flex: none;
+    height: 100vh;                      /* sem dvh, ainda cabe */
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  /* A capa é 1402x854 (1,64:1) e a janela é bem mais larga, então preencher
+     os dois eixos exige recortar. Os 28% sobem o enquadramento até o limite:
+     o corte sai de baixo, onde o overlay entra por cima de qualquer jeito, e
+     acima disso o recorte começaria a comer o título no alto da arte. */
+  .capa {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    object-fit: cover;
+    object-position: center 28%;
+  }
+
+  .abertura__acao {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    /* O padding de cima é a parte transparente do degradê. Vale manter curto:
+       os dois estudantes ficam no rodapé da arte e o overlay come o rosto
+       deles antes de comer qualquer outra coisa. */
+    padding: 3.25rem 1.25rem 1.5rem;
+    background: linear-gradient(to top,
+                rgba(14, 36, 56, 0.97) 0%,
+                rgba(14, 36, 56, 0.93) 45%,
+                rgba(14, 36, 56, 0.66) 78%,
+                rgba(14, 36, 56, 0) 100%);
+    gap: 0.85rem;
+  }
+
+  /* Com 34rem o resumo quebra em três linhas, e é a altura dele que empurra
+     o overlay para cima do rosto dos estudantes. Mais largo, cabe em duas. */
+  .abertura__resumo { max-width: 52rem; }
+
+  /* --- pergunta --------------------------------------------------------- */
+
+  /* A arte encosta em cima e embaixo, então a tela não pode ter padding nem
+     gap sobrando: quem divide altura com o palco é só o rodapé, e ele passa
+     a flutuar por cima. */
+  #tela-pergunta {
+    position: relative;
+    flex: none;
+    height: 100vh;                      /* sem dvh, ainda cabe */
+    height: 100dvh;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  /*
+   * A arte aparece inteira, encostando no topo e no rodapé da janela: a
+   * altura manda e a largura sai dela pela proporção 3:2. Como a janela é
+   * mais larga que 3:2, o que sobra sobra nas laterais — tarja só nos lados.
+   *
+   * O segundo termo do min() é trava para janela mais alta que larga (um
+   * monitor girado, por exemplo). Ali preencher a altura pediria uma arte
+   * mais larga que a janela, que só caberia cortando as laterais. Nesse
+   * caso a altura cede e voltam as tarjas em cima e embaixo — a arte nunca
+   * é cortada, e o card, que vive dentro dela, nunca sai da tela.
+   */
   .palco {
     position: relative;
+    flex: none;
+    width: min(calc(100vh * 1.5), 100vw);
+    width: min(calc(100dvh * 1.5), 100vw);
     aspect-ratio: 1536 / 1024;
-    /* A largura precisa ser explícita. Com 'width: auto' o palco vira
-       shrink-to-fit (é filho de um flex column com align-items: center) e o
-       único filho dele é o card, que é position: absolute e não contribui
-       largura nenhuma — o palco colapsava para 0x0 e a tela ficava vazia.
-       O terceiro termo é o teto de altura convertido em largura: 1536/1024. */
-    width: min(100%, 1400px, calc(78vh * 1.5));
-    margin-inline: auto;
+    max-width: none;
     padding: 0;
-    background: url('assets/fundo.webp') center / 100% 100% no-repeat;
-    border-radius: var(--raio);
+    background: none;
+    border-radius: 0;
     overflow: hidden;
-    /* O conteúdo é dimensionado em relação ao palco, não à janela, para
-       acompanhar a arte do notebook até o projetor. */
+  }
+
+  /* A arte preenche o palco. Continua sendo uma camada própria porque é ela
+     que dá o sistema de coordenadas do card: --card-esq e companhia são
+     posições medidas dentro de fundo.webp. */
+  .palco__arte {
+    position: absolute;
+    inset: 0;
+    background: url('assets/fundo.webp') center / 100% 100% no-repeat;
+    /* O conteúdo é dimensionado em relação à arte, não à janela, para
+       acompanhar do notebook até o projetor. */
     container-type: size;
     container-name: palco;
   }
 
   /* posição medida do card creme dentro de fundo.webp */
-  .palco .card {
+  .palco__arte .card {
     position: absolute;
     left: var(--card-esq);
     top: var(--card-topo);
@@ -524,12 +593,18 @@ img { max-width: 100%; height: auto; display: block; }
   .palco .card__selo { display: none; }
   .rodape__lema { display: none; }
 
+  /* Sem tarja embaixo não sobra faixa para o progresso morar, então ele
+     flutua no canto. A pastilha escura é o que garante a leitura, já que ali
+     a arte varia de céu claro a barranco. */
   .rodape {
+    position: absolute;
+    right: 1.25rem;
+    bottom: 1rem;
+    width: auto;
     max-width: none;
-    width: min(1400px, 100%);
+    padding: 0.35rem 0.9rem;
     justify-content: flex-end;
-    background: none;
-    padding-top: 0.2rem;
+    background: rgba(14, 36, 56, 0.78);
   }
 
   /* A escala vem do próprio slide: enunciado 26pt e alternativas 14pt numa
@@ -547,12 +622,16 @@ img { max-width: 100%; height: auto; display: block; }
     gap: 1.2cqh 1.4cqw;
   }
 
+  /* Como as quatro caixas têm a altura da maior, as alternativas de texto
+     curto sobram altura. Com o alinhamento no topo essa sobra ia toda para
+     baixo do texto, e era isso que ficava desparelho de uma caixa para a
+     outra; centrado, ela se divide em cima e embaixo e lê como respiro. */
   .alternativa {
     font-size: 1.5cqw;
     line-height: 1.25;
-    padding: 1cqh 1.1cqw;
+    padding: 0.7cqh 1.1cqw;
     min-height: 0;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .alternativa__letra { font-size: 1.3cqw; }

@@ -1,4 +1,6 @@
-[
+/* GERADO POR scripts/empacotar.py — não edite à mão. */
+/* Espelho do perguntas.json para o quiz abrir sem servidor. */
+window.PERGUNTAS = [
   {
     "id": 1,
     "linha": 3,
@@ -627,4 +629,4 @@
     "correta": 1,
     "explicacao": ""
   }
-]
+];

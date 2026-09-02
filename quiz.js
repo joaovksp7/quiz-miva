@@ -372,44 +372,61 @@
       document.createTextNode('Não consegui carregar as perguntas. ' + motivo)
     );
     var dica = document.createElement('code');
-    dica.textContent = 'python -m http.server';
+    dica.textContent = 'python scripts/empacotar.py';
     el['aviso-carregando'].appendChild(document.createElement('br'));
     el['aviso-carregando'].appendChild(dica);
     mostrarTela('tela-carregando');
   }
 
-  fetch('perguntas.json')
-    .then(function (r) {
-      if (!r.ok) { throw new Error('HTTP ' + r.status); }
-      return r.json();
-    })
-    .then(function (dados) {
-      banco = dados.filter(function (p) {
-        return p && p.eixo && Array.isArray(p.alternativas) &&
-               p.alternativas.length >= 2 &&
-               typeof p.correta === 'number' &&
-               p.correta >= 0 && p.correta < p.alternativas.length;
-      });
-
-      var faltando = EIXOS.filter(function (eixo) {
-        return banco.filter(function (p) { return p.eixo === eixo.id; }).length < POR_MODULO;
-      });
-      if (faltando.length) {
-        falhar('Faltam perguntas no eixo: ' +
-               faltando.map(function (e) { return e.id; }).join(', ') + '.');
-        return;
-      }
-
-      montarPartida();
-      mostrarTela('tela-abertura');
-    })
-    .catch(function (erro) {
-      /* Aberto por duplo clique, o fetch de arquivo local é bloqueado. */
-      falhar(
-        location.protocol === 'file:'
-          ? 'A página foi aberta direto do disco; suba um servidor local:'
-          : 'Erro: ' + erro.message + '. Rode a partir de um servidor:'
-      );
+  function comecar(dados) {
+    banco = dados.filter(function (p) {
+      return p && p.eixo && Array.isArray(p.alternativas) &&
+             p.alternativas.length >= 2 &&
+             typeof p.correta === 'number' &&
+             p.correta >= 0 && p.correta < p.alternativas.length;
     });
+
+    var faltando = EIXOS.filter(function (eixo) {
+      return banco.filter(function (p) { return p.eixo === eixo.id; }).length < POR_MODULO;
+    });
+    if (faltando.length) {
+      falhar('Faltam perguntas no eixo: ' +
+             faltando.map(function (e) { return e.id; }).join(', ') + '.');
+      return;
+    }
+
+    montarPartida();
+    mostrarTela('tela-abertura');
+  }
+
+  /*
+   * Duas origens para o mesmo conteúdo, nesta ordem:
+   *
+   * 1. window.PERGUNTAS, do perguntas.js — é o caminho normal, e o único que
+   *    funciona com o index.html aberto por duplo clique: em `file://` o
+   *    navegador recusa o fetch de arquivo local (origem 'null'), mas um
+   *    <script src> carrega sem reclamar.
+   * 2. fetch do perguntas.json — rede de segurança para quem serve a pasta e
+   *    ainda não rodou o empacotar.py depois de mexer no JSON.
+   *
+   * O perguntas.js é gerado do perguntas.json, então os dois dizem a mesma
+   * coisa; a fonte da verdade continua sendo o JSON.
+   */
+  if (Array.isArray(window.PERGUNTAS)) {
+    comecar(window.PERGUNTAS);
+  } else if (location.protocol === 'file:') {
+    falhar('O perguntas.js não carregou e, com a página aberta direto do ' +
+           'disco, não dá para ler o JSON. Gere o arquivo com:');
+  } else {
+    fetch('perguntas.json')
+      .then(function (r) {
+        if (!r.ok) { throw new Error('HTTP ' + r.status); }
+        return r.json();
+      })
+      .then(comecar)
+      .catch(function (erro) {
+        falhar('Erro: ' + erro.message + '. Gere o perguntas.js com:');
+      });
+  }
 
 })();

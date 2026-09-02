@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Missão Clima — Enchentes e deslizamentos</title>
 <meta name="description" content="Quiz educativo sobre enchentes e deslizamentos, do MIVA — Memorial das Inundações nos Vales.">
+<!-- Gerado por scripts/empacotar.py: a Poppins embutida em base64. Vem antes
+     do style.css porque é a mesma família que ele usa. -->
+<link rel="stylesheet" href="fontes.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -43,15 +46,22 @@
   <!-- 3. Pergunta -->
   <section id="tela-pergunta" class="tela" hidden aria-labelledby="enunciado">
     <div class="palco">
-      <div class="card">
-        <img class="card__selo" src="assets/selo-miva.webp" width="426" height="378"
-             alt="MIVA — Memorial das Inundações nos Vales">
-        <h2 class="card__enunciado" id="enunciado"></h2>
-        <ul class="alternativas" id="alternativas"></ul>
-        <p class="veredito" id="veredito" hidden></p>
-        <p class="explicacao" id="explicacao" hidden></p>
-        <div class="card__acao">
-          <button type="button" id="btn-avancar" class="botao" hidden>Avançar</button>
+      <!-- No desktop a arte é maior que a janela: o .palco recorta e o
+           .palco__arte é a imagem inteira. A separação importa porque as
+           medidas do card (--card-esq e companhia) são posições dentro da
+           arte, não dentro da janela — é o .palco__arte que dá esse
+           sistema de coordenadas. No celular os dois são só divs. -->
+      <div class="palco__arte">
+        <div class="card">
+          <img class="card__selo" src="assets/selo-miva.webp" width="426" height="378"
+               alt="MIVA — Memorial das Inundações nos Vales">
+          <h2 class="card__enunciado" id="enunciado"></h2>
+          <ul class="alternativas" id="alternativas"></ul>
+          <p class="veredito" id="veredito" hidden></p>
+          <p class="explicacao" id="explicacao" hidden></p>
+          <div class="card__acao">
+            <button type="button" id="btn-avancar" class="botao" hidden>Avançar</button>
+          </div>
         </div>
       </div>
     </div>
@@ -94,6 +104,9 @@
 <!-- Região viva: anuncia acerto/erro e troca de tela para leitor de tela. -->
 <p id="anuncio" class="oculto-visual" role="status" aria-live="polite"></p>
 
+<!-- Gerado por scripts/empacotar.py a partir do perguntas.json. É um <script>
+     e não um fetch para o quiz também rodar aberto direto do disco. -->
+<script src="perguntas.js"></script>
 <script src="quiz.js"></script>
 </body>
 </html>
