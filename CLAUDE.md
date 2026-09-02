@@ -83,6 +83,7 @@ index.html
 style.css
 quiz.js
 perguntas.json          # TODO o conteúdo — gerado, não editado à mão
+perguntas.js            # espelho do JSON como script — gerado junto, só para file://
 correcoes.json          # correções editoriais aplicadas sobre o .pptx
 assets/                 # tudo extraído de ppt/media/ do .pptx, convertido em WebP
   fundo.webp            # frame inteiro da tela de pergunta (1536x1024)
@@ -99,7 +100,11 @@ plano-quiz-miva.md
 README.md
 ```
 
-`quiz.js` carrega o `perguntas.json` por `fetch`, então **`index.html` não abre por duplo clique em `file://`** — dev local exige `python -m http.server`. Isso também elimina a opção "bloco HTML personalizado" do WordPress, onde o caminho relativo do JSON resolveria contra o domínio do WP. **A publicação é por iframe.**
+`quiz.js` carrega o `perguntas.json` por `fetch`. Servido por HTTP é assim que o conteúdo entra — o JSON é a fonte. Aberto por `file://`, o `fetch` morre no CORS (cada arquivo é uma origem opaca), e aí vale o **`perguntas.js`**, que o `index.html` carrega por `<script>` e que declara `window.PERGUNTAS` com uma cópia byte a byte do mesmo array. Por isso **`index.html` abre por duplo clique**.
+
+O `perguntas.js` é **gerado pelo `extrair.py` na mesma rodada do JSON** — nunca editado à mão, nunca gerado por script separado. Editar o `perguntas.json` sem rerodar o extrator faz os dois divergirem, e o duplo clique passa a mostrar a versão velha.
+
+Isso **não** libera a opção "bloco HTML personalizado" do WordPress: os caminhos relativos dos assets e do CSS continuam resolvendo contra o domínio do WP. **A publicação segue por iframe.**
 
 ---
 

@@ -378,36 +378,46 @@
     mostrarTela('tela-carregando');
   }
 
+  function usar(dados) {
+    banco = dados.filter(function (p) {
+      return p && p.eixo && Array.isArray(p.alternativas) &&
+             p.alternativas.length >= 2 &&
+             typeof p.correta === 'number' &&
+             p.correta >= 0 && p.correta < p.alternativas.length;
+    });
+
+    var faltando = EIXOS.filter(function (eixo) {
+      return banco.filter(function (p) { return p.eixo === eixo.id; }).length < POR_MODULO;
+    });
+    if (faltando.length) {
+      falhar('Faltam perguntas no eixo: ' +
+             faltando.map(function (e) { return e.id; }).join(', ') + '.');
+      return;
+    }
+
+    montarPartida();
+    mostrarTela('tela-abertura');
+  }
+
+  /* Servido por HTTP, a fonte é o perguntas.json — é ele que o extrator gera e
+     que a revisão humana lê. Aberto por duplo clique, o fetch de arquivo local
+     morre no CORS; aí vale o perguntas.js, carregado por <script> no HTML, que
+     é cópia do mesmo JSON. */
   fetch('perguntas.json')
     .then(function (r) {
       if (!r.ok) { throw new Error('HTTP ' + r.status); }
       return r.json();
     })
-    .then(function (dados) {
-      banco = dados.filter(function (p) {
-        return p && p.eixo && Array.isArray(p.alternativas) &&
-               p.alternativas.length >= 2 &&
-               typeof p.correta === 'number' &&
-               p.correta >= 0 && p.correta < p.alternativas.length;
-      });
-
-      var faltando = EIXOS.filter(function (eixo) {
-        return banco.filter(function (p) { return p.eixo === eixo.id; }).length < POR_MODULO;
-      });
-      if (faltando.length) {
-        falhar('Faltam perguntas no eixo: ' +
-               faltando.map(function (e) { return e.id; }).join(', ') + '.');
+    .then(usar)
+    .catch(function (erro) {
+      if (Array.isArray(window.PERGUNTAS) && window.PERGUNTAS.length) {
+        usar(window.PERGUNTAS);
         return;
       }
-
-      montarPartida();
-      mostrarTela('tela-abertura');
-    })
-    .catch(function (erro) {
-      /* Aberto por duplo clique, o fetch de arquivo local é bloqueado. */
       falhar(
         location.protocol === 'file:'
-          ? 'A página foi aberta direto do disco; suba um servidor local:'
+          ? 'A página foi aberta direto do disco e o perguntas.js não carregou; ' +
+            'rode scripts/extrair.py ou suba um servidor local:'
           : 'Erro: ' + erro.message + '. Rode a partir de um servidor:'
       );
     });
