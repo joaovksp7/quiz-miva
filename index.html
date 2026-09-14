@@ -82,16 +82,27 @@
   </section>
 
   <!-- 5. Resultado final -->
-  <section id="tela-final" class="tela" hidden aria-labelledby="final-titulo">
-    <h2 class="resultado__titulo" id="final-titulo">Missão concluída!</h2>
-    <p class="placar">
-      <span id="final-acertos">0</span><span class="placar__de"> de 15</span>
-    </p>
-    <p class="resultado__frase" id="final-frase"></p>
-    <ul class="retomada" id="retomada"></ul>
-    <button type="button" id="btn-jogar-de-novo" class="botao">
-      Jogar de novo com perguntas novas
-    </button>
+  <section id="tela-final" class="tela tela--final" hidden aria-labelledby="final-titulo">
+    <!-- Fundo prismático em WebGL, montado pelo fundo-prisma.js. É decoração:
+         se não montar, fica o degradê do CSS e nada muda para quem usa leitor
+         de tela. -->
+    <div class="prisma" id="prisma" aria-hidden="true"></div>
+
+    <div class="final__conteudo">
+      <img class="final__selo" src="assets/selo-miva.webp" width="426" height="378" alt="">
+      <!-- As estrelas repetem, em imagem, o que o placar e a frase já dizem
+           em texto — por isso ficam escondidas do leitor de tela. -->
+      <p class="estrelas" id="final-estrelas" aria-hidden="true"></p>
+      <h2 class="resultado__titulo" id="final-titulo">Missão concluída!</h2>
+      <p class="placar">
+        <span id="final-acertos">0</span><span class="placar__de"> de 15</span>
+      </p>
+      <p class="resultado__frase" id="final-frase"></p>
+      <ul class="retomada" id="retomada"></ul>
+      <button type="button" id="btn-jogar-de-novo" class="botao">
+        Jogar de novo com perguntas novas
+      </button>
+    </div>
   </section>
 
   <!-- Carregando / erro -->
@@ -107,6 +118,8 @@
 <!-- Espelho do perguntas.json. Só é usado quando o fetch não pode rodar,
      isto é, quando a página foi aberta direto do disco. Gerado, não editar. -->
 <script src="perguntas.js"></script>
+<!-- Fundo da tela de resultado. Vem antes do quiz.js, que é quem o monta. -->
+<script src="fundo-prisma.js"></script>
 <script src="quiz.js"></script>
 </body>
 </html>

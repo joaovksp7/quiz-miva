@@ -51,7 +51,8 @@
    'tela-final', 'tela-carregando', 'transicao-numero', 'transicao-titulo',
    'transicao-frase', 'enunciado', 'alternativas', 'veredito', 'explicacao',
    'progresso', 'modulo-titulo', 'modulo-acertos', 'modulo-frase',
-   'final-acertos', 'final-frase', 'retomada', 'aviso-carregando', 'anuncio',
+   'final-acertos', 'final-frase', 'final-estrelas', 'retomada', 'prisma',
+   'aviso-carregando', 'anuncio',
    'btn-comecar', 'btn-iniciar-modulo', 'btn-avancar', 'btn-seguir',
    'btn-jogar-de-novo'].forEach(function (id) {
     el[id] = document.getElementById(id);
@@ -72,6 +73,10 @@
   }
 
   function mostrarTela(id) {
+    /* O fundo em WebGL só existe na tela final. Saiu dela, desmonta: não fica
+       um canvas moendo GPU atrás de uma pergunta. */
+    if (id !== 'tela-final' && window.FundoPrisma) { window.FundoPrisma.parar(); }
+
     ['tela-abertura', 'tela-transicao', 'tela-pergunta', 'tela-modulo',
      'tela-final', 'tela-carregando'].forEach(function (t) {
       el[t].hidden = (t !== id);
@@ -81,6 +86,41 @@
 
   function anunciar(texto) {
     el.anuncio.textContent = texto;
+  }
+
+  function menosMovimento() {
+    try {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  /* --- placar animado ----------------------------------------------------- */
+  /* O número sobe de 0 até o total. Quem pediu menos movimento recebe o valor
+     direto — e o anúncio para leitor de tela nunca passa por aqui, ele já sai
+     pronto no anunciar(). */
+
+  var contagem = 0;
+
+  function contarPlacar(alvo, total, duracao) {
+    if (contagem) { cancelAnimationFrame(contagem); contagem = 0; }
+
+    if (menosMovimento() || total <= 0) {
+      alvo.textContent = String(total);
+      return;
+    }
+
+    var inicio = 0;
+    alvo.textContent = '0';
+
+    contagem = requestAnimationFrame(function passo(marca) {
+      if (!inicio) { inicio = marca; }
+      var t = Math.min((marca - inicio) / duracao, 1);
+      var suave = 1 - Math.pow(1 - t, 3);          /* desacelera no fim */
+      alvo.textContent = String(Math.round(total * suave));
+      contagem = t < 1 ? requestAnimationFrame(passo) : 0;
+    });
   }
 
   /* --- histórico entre partidas ----------------------------------------- */
@@ -273,11 +313,11 @@
   function mostrarResultadoModulo() {
     var n = acertos[modulo];
     el['modulo-titulo'].textContent = EIXOS[modulo].titulo;
-    el['modulo-acertos'].textContent = String(n);
     el['modulo-frase'].textContent = fraseModulo(n);
     el['btn-seguir'].textContent =
       modulo === EIXOS.length - 1 ? 'Ver o resultado final' : 'Ir para o próximo bloco';
     mostrarTela('tela-modulo');
+    contarPlacar(el['modulo-acertos'], n, 600);
     el['btn-seguir'].focus();
     anunciar(n + ' de ' + POR_MODULO + ' neste bloco.');
   }
@@ -301,12 +341,14 @@
 
   function mostrarResultadoFinal() {
     var total = acertos.reduce(function (a, b) { return a + b; }, 0);
-    el['final-acertos'].textContent = String(total);
     el['final-frase'].textContent = fraseFinal(total);
+    el['tela-final'].setAttribute('data-nivel', String(nivelFinal(total)));
+    marcarEstrelas(total);
 
     el.retomada.textContent = '';
     EIXOS.forEach(function (eixo, i) {
       var li = document.createElement('li');
+      li.style.setProperty('--i', String(i));   /* atraso da cascata, no CSS */
       var nome = document.createElement('span');
       nome.textContent = eixo.titulo;
       var placar = document.createElement('b');
@@ -317,6 +359,8 @@
     });
 
     mostrarTela('tela-final');
+    montarFundo();
+    contarPlacar(el['final-acertos'], total, 1200);
     el['btn-jogar-de-novo'].focus();
     anunciar('Resultado final: ' + total + ' de ' + (POR_MODULO * EIXOS.length) + '.');
   }
@@ -326,6 +370,42 @@
     if (total >= 10) { return 'Boa! Você já sabe reconhecer os principais riscos.'; }
     if (total >= 6) { return 'Está no caminho. Jogue de novo: as perguntas mudam.'; }
     return 'Vale jogar mais uma vez com calma, lendo cada explicação.';
+  }
+
+  /* --- comemoração da tela final ------------------------------------------ */
+  /* As faixas são as mesmas do fraseFinal: o resultado é dito por texto, por
+     estrela e por cor, nunca só por cor. */
+
+  function nivelFinal(total) {
+    if (total >= 14) { return 3; }
+    if (total >= 10) { return 2; }
+    if (total >= 6) { return 1; }
+    return 0;
+  }
+
+  function marcarEstrelas(total) {
+    var acesas = nivelFinal(total);
+    el['final-estrelas'].textContent = '';
+    for (var i = 0; i < 3; i++) {
+      var estrela = document.createElement('span');
+      estrela.textContent = '★';
+      estrela.style.setProperty('--i', String(i));
+      if (i < acesas) { estrela.className = 'estrela--acesa'; }
+      el['final-estrelas'].appendChild(estrela);
+    }
+  }
+
+  /* Cores da identidade MIVA, não o espectro do componente original. Se o
+     WebGL2 não existir, montar() devolve false e o degradê do CSS fica. */
+  function montarFundo() {
+    if (!window.FundoPrisma) { return; }
+    window.FundoPrisma.montar(el.prisma, {
+      cores: ['#FFD21F', '#ACB824', '#4E8AB2'],
+      intensidade: 2.2,
+      velocidade: 0.4,
+      distorcao: 1.2,
+      raios: 20
+    });
   }
 
   function jogarDeNovo() {
