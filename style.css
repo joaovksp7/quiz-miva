@@ -141,7 +141,7 @@ img { max-width: 100%; height: auto; display: block; }
 /* --- 1. abertura ------------------------------------------------------- */
 
 /* No celular a capa fica inteira, com a faixa navy embaixo — recortar não
-   serve aqui, porque a arte é 1,64:1 e a tela em retrato é 0,46:1: sobraria
+   serve aqui, porque a arte é 1,66:1 e a tela em retrato é 0,46:1: sobraria
    uma tirinha central de 28% da largura. O tela-cheia da abertura mora na
    media query de desktop, lá embaixo.
 
@@ -457,7 +457,7 @@ img { max-width: 100%; height: auto; display: block; }
     overflow: hidden;
   }
 
-  /* A capa é 1402x854 (1,64:1) e a janela é bem mais larga, então preencher
+  /* A capa é 1402x846 (1,66:1) e a janela é bem mais larga, então preencher
      os dois eixos exige recortar. Os 28% sobem o enquadramento até o limite:
      o corte sai de baixo, onde o overlay entra por cima de qualquer jeito, e
      acima disso o recorte começaria a comer o título no alto da arte. */

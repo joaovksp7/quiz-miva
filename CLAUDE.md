@@ -87,12 +87,13 @@ perguntas.js            # espelho do JSON como script — gerado junto, só para
 correcoes.json          # correções editoriais aplicadas sobre o .pptx
 assets/                 # tudo extraído de ppt/media/ do .pptx, convertido em WebP
   fundo.webp            # frame inteiro da tela de pergunta (1536x1024)
-  capa.webp             # capa do slide 1, cortada a 76,2% de altura
+  capa.webp             # capa da abertura, de fonte/capa-missao-clima.png cortada a 75,4% de altura
   selo-miva.webp        # logo do Memorial das Inundações nos Vales
   moldura.webp          # moldura desenhada à mão, usada em border-image
   fontes/               # Poppins woff2, 400 e 700, latin + latin-ext (26 KB)
 fonte/
   Pergunta aqui.pptx    # fonte da verdade do conteúdo
+  capa-missao-clima.png # arte original da capa, inteira — a capa.webp sai dela
 scripts/
   extrair.py            # roda uma vez, fora do site
   gerar-explicacoes.js  # roda uma vez, fora do site
@@ -159,7 +160,7 @@ Os eixos são desbalanceados — 11 / 16 / 18. Com 5 por partida, `alerta` só a
 
 Cinco telas, ancoradas em slides específicos. Reproduzir o slide, não inventar layout novo.
 
-1. **Abertura** — reproduz a capa do slide 1, título Missão Clima, botão "Aceite essa missão!"
+1. **Abertura** — a capa de `fonte/capa-missao-clima.png`, título Missão Clima, botão "Aceite essa missão!"
 2. **Transição de módulo** — reproduz os divisores dos slides 2, 14 e 31, nomeando o eixo
 3. **Pergunta** — card creme central, enunciado emoldurado, alternativas em grade
 4. **Resultado do módulo** — acertos do bloco, botão de seguir
@@ -220,7 +221,7 @@ Três tokens **não** vêm do arquivo, e existem só porque o original não pass
 
 **O card creme vem chapado dentro de `fundo.webp`.** A posição medida dele dentro da imagem (16,67% / 28,71% / 61,13% / 55,47%) está em `:root` como `--card-*`, e é o que mantém o conteúdo HTML alinhado com a arte. Mexeu na imagem, remede.
 
-**A capa foi cortada a 76,2% da altura** justamente para tirar o botão "ACEITE ESSA MISSÃO!" que estava chapado em pixels — ele agora é um `<button>` de verdade, que escala, recebe foco e é lido por leitor de tela.
+**A capa foi cortada a 75,4% da altura** (1402x1122 → 1402x846, linha 846 do `fonte/capa-missao-clima.png`) justamente para tirar o botão "ACEITE ESSA MISSÃO!" que estava chapado em pixels, junto com a faixa de três itens e o rodapé que vinham embaixo dele — ele agora é um `<button>` de verdade, que escala, recebe foco e é lido por leitor de tela.
 
 ---
 
