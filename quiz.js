@@ -13,21 +13,26 @@
 
   var POR_MODULO = 5;
 
-  /* A ordem é a mesma do arquivo de origem e não muda. */
+  /* A ordem é a mesma do arquivo de origem e não muda. O 'curto' existe só
+     para caber no botão do resultado do módulo, que já começa com "Ir para o
+     bloco 3:" — o título inteiro estouraria a linha no celular. */
   var EIXOS = [
     {
       id: 'alerta',
       titulo: 'Alertas!',
+      curto: 'Alertas!',
       frase: 'Reconhecer os sinais e saber de onde vem o aviso.'
     },
     {
       id: 'preparacao',
       titulo: 'Preparação',
+      curto: 'Preparação',
       frase: 'O que dá para organizar antes de a água subir.'
     },
     {
       id: 'durante',
       titulo: 'Durante o evento climático',
+      curto: 'Durante',
       frase: 'A hora de agir com cuidado, sem se colocar em risco.'
     }
   ];
@@ -42,6 +47,10 @@
   var modulo = 0;
   var indice = 0;
   var acertos = [0, 0, 0];
+  /* Quais perguntas do módulo saíram certas, na ordem em que foram
+     respondidas. É o que as cápsulas do resultado do módulo mostram — a
+     contagem em 'acertos' não diz qual foi qual. */
+  var resultados = [[], [], []];
   var respondida = false;
 
   /* --- elementos -------------------------------------------------------- */
@@ -49,12 +58,15 @@
   var el = {};
   ['tela-abertura', 'tela-transicao', 'tela-pergunta', 'tela-modulo',
    'tela-final', 'tela-carregando', 'transicao-numero', 'transicao-titulo',
-   'transicao-frase', 'enunciado', 'alternativas', 'veredito', 'explicacao',
+   'transicao-frase', 'transicao-badge', 'enunciado', 'alternativas', 'veredito', 'explicacao',
    'progresso', 'modulo-titulo', 'modulo-acertos', 'modulo-frase',
+   'modulo-impacto', 'modulo-faixa', 'modulo-faixa-texto',
+   'modulo-precisao', 'modulo-gemas', 'modulo-progresso',
+   'modulo-barra', 'prisma-modulo',
    'final-acertos', 'final-frase', 'final-estrelas', 'retomada', 'prisma',
    'aviso-carregando', 'anuncio',
    'btn-comecar', 'btn-iniciar-modulo', 'btn-avancar', 'btn-seguir',
-   'btn-jogar-de-novo'].forEach(function (id) {
+   'btn-seguir-texto', 'btn-jogar-de-novo'].forEach(function (id) {
     el[id] = document.getElementById(id);
   });
 
@@ -73,9 +85,14 @@
   }
 
   function mostrarTela(id) {
-    /* O fundo em WebGL só existe na tela final. Saiu dela, desmonta: não fica
-       um canvas moendo GPU atrás de uma pergunta. */
-    if (id !== 'tela-final' && window.FundoPrisma) { window.FundoPrisma.parar(); }
+    /* O fundo em WebGL só existe nas duas telas de resultado. Saiu delas,
+       desmonta: não fica um canvas moendo GPU atrás de uma pergunta. */
+    if (id !== 'tela-final' && id !== 'tela-modulo' && window.FundoPrisma) {
+      window.FundoPrisma.parar();
+    }
+    /* Trocou de tela, os confetes param — quem avança rápido não leva papel
+       picado para dentro da próxima pergunta. */
+    if (window.Confetes) { window.Confetes.parar(); }
 
     ['tela-abertura', 'tela-transicao', 'tela-pergunta', 'tela-modulo',
      'tela-final', 'tela-carregando'].forEach(function (t) {
@@ -192,6 +209,7 @@
     modulo = 0;
     indice = 0;
     acertos = [0, 0, 0];
+    resultados = [[], [], []];
   }
 
   /* --- telas ------------------------------------------------------------- */
@@ -199,9 +217,13 @@
   function irParaTransicao() {
     var eixo = EIXOS[modulo];
     el['transicao-numero'].textContent = String(modulo + 1);
+    el['transicao-badge'].textContent = String(modulo + 1);
     el['transicao-titulo'].textContent = eixo.titulo;
     el['transicao-frase'].textContent = eixo.frase;
+    /* O CSS escolhe o ícone do emblema por aqui. */
+    el['tela-transicao'].setAttribute('data-eixo', eixo.id);
     mostrarTela('tela-transicao');
+    if (window.Confetes) { window.Confetes.disparar('normal'); }
     el['btn-iniciar-modulo'].focus();
     anunciar('Bloco ' + (modulo + 1) + ' de 3: ' + eixo.titulo);
   }
@@ -262,6 +284,7 @@
 
     var certo = escolhido.getAttribute('data-certa') === '1';
     if (certo) { acertos[modulo]++; }
+    resultados[modulo][indice] = certo;
 
     var botoes = el.alternativas.querySelectorAll('.alternativa');
     Array.prototype.forEach.call(botoes, function (b) {
@@ -310,23 +333,116 @@
     }
   }
 
-  function mostrarResultadoModulo() {
-    var n = acertos[modulo];
-    el['modulo-titulo'].textContent = EIXOS[modulo].titulo;
-    el['modulo-frase'].textContent = fraseModulo(n);
-    el['btn-seguir'].textContent =
-      modulo === EIXOS.length - 1 ? 'Ver o resultado final' : 'Ir para o próximo bloco';
-    mostrarTela('tela-modulo');
-    contarPlacar(el['modulo-acertos'], n, 600);
-    el['btn-seguir'].focus();
-    anunciar(n + ' de ' + POR_MODULO + ' neste bloco.');
+  /* --- 4. resultado do módulo --------------------------------------------- */
+  /* A tela é a do mockup em assets/tela-finalizacao-modulo/: medalhão, faixa,
+     título de impacto, placar, uma cápsula por pergunta e a barra da missão.
+     Os textos por faixa de acerto vêm de lá; a porcentagem, não — o mockup
+     mostrava 20% fixo para qualquer resultado abaixo de 3/5. */
+
+  function textosModulo(n) {
+    if (n === POR_MODULO) {
+      return {
+        impacto: 'Impecável!',
+        faixa: 'Módulo perfeito!',
+        frase: 'Incrível! Você acertou todas as 5 questões de primeira. ' +
+               'Uma verdadeira referência em proteção comunitária!'
+      };
+    }
+    if (n === 4) {
+      return {
+        impacto: 'Mandou muito!',
+        faixa: 'Quase perfeito!',
+        frase: 'Excelente aproveitamento! Apenas um deslize pequeno, você ' +
+               'está super preparado para proteger sua família.'
+      };
+    }
+    if (n === 3) {
+      return {
+        impacto: 'Bom trabalho!',
+        faixa: 'Bloco superado!',
+        frase: 'Bom resultado! Você assimilou os pontos principais. Cada ' +
+               'detalhe aprendido é segurança garantida na prática.'
+      };
+    }
+    return {
+      impacto: 'Valeu o treino!',
+      faixa: 'Continue praticando!',
+      frase: 'Missão concluída! Errar no treino é a melhor forma de acertar ' +
+             'na vida real. Vale revisar as dicas deste bloco!'
+    };
   }
 
-  function fraseModulo(n) {
-    if (n === POR_MODULO) { return 'Bloco inteiro certo.'; }
-    if (n >= 3) { return 'Bom resultado neste bloco.'; }
-    if (n >= 1) { return 'Dá para melhorar — e cada erro aqui é um aprendizado a menos lá fora.'; }
-    return 'Este bloco foi difícil. Vale voltar nele depois.';
+  function textoSeguir() {
+    if (modulo === EIXOS.length - 1) { return 'Ver resultado'; }
+    return 'Próximo bloco';
+  }
+
+  /* Uma cápsula por pergunta, na ordem em que foram respondidas. O símbolo é
+     decorativo — quem usa leitor de tela recebe a frase inteira. */
+  function renderGemas(lista) {
+    el['modulo-gemas'].textContent = '';
+    for (var i = 0; i < POR_MODULO; i++) {
+      var certo = lista[i] === true;
+      var li = document.createElement('li');
+      li.className = 'gema ' + (certo ? 'gema--certa' : 'gema--errada');
+      li.style.setProperty('--i', String(i));   /* atraso da cascata, no CSS */
+
+      var simbolo = document.createElement('span');
+      simbolo.setAttribute('aria-hidden', 'true');
+      simbolo.textContent = certo ? '✓' : '✕';
+
+      var rotulo = document.createElement('span');
+      rotulo.className = 'oculto-visual';
+      rotulo.textContent = 'Pergunta ' + (i + 1) + ': ' +
+                           (certo ? 'certa' : 'errada') + '.';
+
+      li.appendChild(simbolo);
+      li.appendChild(rotulo);
+      el['modulo-gemas'].appendChild(li);
+    }
+  }
+
+  function mostrarResultadoModulo() {
+    var n = acertos[modulo];
+    var texto = textosModulo(n);
+    var eixo = EIXOS[modulo];
+    var trilha = Math.round(((modulo + 1) / EIXOS.length) * 100);
+
+    el['modulo-titulo'].textContent = eixo.titulo;
+    el['modulo-impacto'].textContent = texto.impacto;
+    el['modulo-faixa-texto'].textContent = texto.faixa;
+    el['modulo-frase'].textContent = texto.frase;
+    el['btn-seguir-texto'].textContent = textoSeguir();
+
+    /* A faixa dourada é do bloco inteiro certo; abaixo disso ela fica
+       discreta. */
+    el['modulo-faixa'].className =
+      'faixa ' + (n === POR_MODULO ? 'faixa--perfeita' : 'faixa--simples');
+
+    el['modulo-precisao'].textContent =
+      Math.round((n / POR_MODULO) * 100) + '% de precisão!';
+    el['modulo-progresso'].textContent = trilha + '% concluído';
+
+    renderGemas(resultados[modulo]);
+
+    mostrarTela('tela-modulo');
+    montarFundo(el['prisma-modulo']);
+
+    /* A barra só corre depois de a tela existir na página: em display:none
+       transição nenhuma roda. O offsetWidth é o reflow que separa os dois
+       valores — sem ele o navegador vê só a largura final. */
+    el['modulo-barra'].style.width = '0%';
+    void el['modulo-barra'].offsetWidth;
+    el['modulo-barra'].style.width = trilha + '%';
+
+    contarPlacar(el['modulo-acertos'], n, 600);
+
+    if (n >= 3 && window.Confetes) {
+      window.Confetes.disparar(n === POR_MODULO ? 'mega' : 'normal');
+    }
+
+    el['btn-seguir'].focus();
+    anunciar(texto.impacto + ' ' + n + ' de ' + POR_MODULO + ' neste bloco.');
   }
 
   function seguir() {
@@ -359,7 +475,7 @@
     });
 
     mostrarTela('tela-final');
-    montarFundo();
+    montarFundo(el.prisma);
     contarPlacar(el['final-acertos'], total, 1200);
     el['btn-jogar-de-novo'].focus();
     anunciar('Resultado final: ' + total + ' de ' + (POR_MODULO * EIXOS.length) + '.');
@@ -396,10 +512,12 @@
   }
 
   /* Cores da identidade MIVA, não o espectro do componente original. Se o
-     WebGL2 não existir, montar() devolve false e o degradê do CSS fica. */
-  function montarFundo() {
+     WebGL2 não existir, montar() devolve false e o degradê do CSS fica.
+     As duas telas de resultado usam o mesmo fundo, cada uma com seu
+     hospedeiro: quem monta passa o seu. */
+  function montarFundo(hospedeiro) {
     if (!window.FundoPrisma) { return; }
-    window.FundoPrisma.montar(el.prisma, {
+    window.FundoPrisma.montar(hospedeiro, {
       cores: ['#FFD21F', '#ACB824', '#4E8AB2'],
       intensidade: 2.2,
       velocidade: 0.4,

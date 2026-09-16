@@ -190,35 +190,8 @@ img { max-width: 100%; height: auto; display: block; }
 .abertura__resumo strong { color: var(--verde); }
 
 /* --- 2. transição de módulo -------------------------------------------- */
-
-#tela-transicao {
-  background: var(--navy);
-  color: var(--creme);
-  text-align: center;
-}
-
-.transicao__etapa {
-  margin: 0;
-  font-size: clamp(0.85rem, 2.4vw, 1rem);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--azul-borda);
-}
-
-.transicao__titulo {
-  margin: 0;
-  font-size: clamp(2rem, 9vw, 4.5rem);
-  line-height: 1.05;
-  text-transform: uppercase;
-  color: var(--amarelo);
-  max-width: 16ch;
-}
-
-.transicao__frase {
-  margin: 0;
-  max-width: 32rem;
-  font-size: clamp(1rem, 3vw, 1.25rem);
-}
+/* Mora no fim do arquivo, junto das outras telas animadas: precisa vir depois
+   do bloco de movimento reduzido geral. */
 
 /* --- 3. pergunta ------------------------------------------------------- */
 
@@ -846,5 +819,795 @@ img { max-width: 100%; height: auto; display: block; }
     opacity: 1 !important;
     transform: none !important;
     filter: none !important;
+  }
+}
+
+/* ==========================================================================
+   4. Resultado do módulo — comemoração de fim de bloco
+
+   Reprodução do mockup em assets/tela-finalizacao-modulo/ (screen.png), em
+   CSS puro: o original é Tailwind por CDN mais Fredoka do Google Fonts, e
+   nada disso entra em runtime aqui. Três diferenças de propósito:
+
+   - a pílula verde "+50 SABEDORIA" não existe — o quiz não tem moeda;
+   - o fundo é só o prisma em WebGL, o mesmo da tela final. A roda de raios
+     giratória e o medalhão do bloco (disco, ícone do eixo, pílula "BLOCO 1
+     DE 3" e selo do canto) saíram a pedido do dono do projeto: o fundo fica
+     limpo e a tela começa na faixa de impacto;
+   - os pesos 800/900 viram 700, o único bold que a Poppins self-hosted traz.
+     Peso sintético borra a letra no projetor.
+
+   Este bloco vem depois do de movimento reduzido lá de cima, que é
+   !important e continuaria ganhando destas regras; o desligamento próprio
+   das animações daqui está no fim do arquivo.
+   ========================================================================== */
+
+.tela--modulo {
+  position: relative;
+  gap: 0;
+}
+
+.modulo__conteudo {
+  position: relative;
+  z-index: 1;
+  margin-block: auto;                 /* centraliza e empurra o rodapé */
+  width: 100%;
+  max-width: 36rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+/* --- faixa de impacto ---------------------------------------------------- */
+
+@keyframes faixa-brilho {
+  0%   { transform: translateX(-150%) skewX(-25deg); }
+  100% { transform: translateX(250%) skewX(-25deg); }
+}
+
+.faixa {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 1.1rem;
+  border-radius: 999px;
+  font-size: clamp(0.68rem, 2.6vw, 0.85rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.faixa--perfeita {
+  background: linear-gradient(90deg, #FFB800 0%, var(--amarelo) 50%, #FFB800 100%);
+  color: var(--navy);
+  box-shadow: 0 4px 0 #B78200, 0 8px 20px rgba(0, 0, 0, 0.3);
+  transform: rotate(-1deg);
+}
+
+.faixa--perfeita::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+              transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
+  animation: faixa-brilho 2.5s linear infinite;
+}
+
+.faixa--simples {
+  background: #102738;
+  border: 2px solid rgba(135, 163, 174, 0.4);
+  color: var(--creme);
+  letter-spacing: 0.08em;
+}
+
+/* --- títulos ------------------------------------------------------------- */
+
+/* line-height folgado o bastante para o acento de IMPECÁVEL não subir por
+   cima da faixa — em caixa alta a Poppins põe o agudo bem no topo. */
+.impacto {
+  margin: 0.3rem 0 0;
+  font-size: clamp(1.9rem, 9vw, 3rem);
+  line-height: 1.12;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.015em;
+  color: var(--creme);
+  text-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+}
+
+.modulo__completou {
+  margin: 0;
+  font-size: clamp(0.78rem, 3vw, 1rem);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--azul-borda);
+}
+
+.modulo__eixo {
+  color: var(--amarelo);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-decoration-color: rgba(255, 210, 31, 0.5);
+  text-underline-offset: 3px;
+}
+
+/* --- placar do bloco ----------------------------------------------------- */
+/* Sem a pílula "+50 SABEDORIA" do mockup, o placar fica sozinho e centrado. */
+
+.placar--modulo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  margin: 0.2rem 0;
+  padding: 0.3rem 1.1rem;
+  border: 2px solid rgba(135, 163, 174, 0.3);
+  border-radius: 1.1rem;
+  background: rgba(24, 56, 80, 0.8);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  font-size: 1rem;                    /* desfaz a escala gigante de .placar */
+}
+
+.placar--modulo .placar__numero {
+  font-size: clamp(2.2rem, 9vw, 3rem);
+  line-height: 1;
+  color: var(--amarelo);
+  text-shadow: 0 2px 10px rgba(255, 210, 31, 0.45);
+}
+
+.placar--modulo .placar__de {
+  font-size: clamp(1rem, 3.6vw, 1.3rem);
+  color: rgba(249, 241, 229, 0.85);
+}
+
+.placar__rotulo {
+  margin-left: 0.15rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--azul-borda);
+}
+
+/* --- painel: cápsulas e trilha ------------------------------------------- */
+
+@keyframes gema-surgir {
+  0%   { transform: scale(0); opacity: 0; }
+  60%  { transform: scale(1.35); opacity: 1; }
+  80%  { transform: scale(0.88); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.painel {
+  width: 100%;
+  max-width: 24rem;
+  padding: 0.8rem;
+  border: 2px solid rgba(135, 163, 174, 0.3);
+  border-radius: 1.1rem;
+  background: rgba(24, 56, 80, 0.9);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.painel__cabecalho,
+.trilha__cabecalho {
+  margin: 0 0 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--azul-borda);
+  text-align: left;
+}
+
+.painel__cabecalho b { color: var(--amarelo); }
+.trilha__cabecalho b { color: var(--creme); }
+
+.gemas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.45rem;
+}
+
+.gema {
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  animation: gema-surgir 500ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(200ms + var(--i, 0) * 90ms);
+}
+
+.gema--certa {
+  background: linear-gradient(180deg, #D5E232 0%, var(--verde) 100%);
+  border: 2px solid var(--creme);
+  color: var(--navy);
+  box-shadow: 0 4px 0 #7B8512, 0 0 16px rgba(172, 184, 36, 0.45);
+}
+
+.gema--errada {
+  background: #142E44;
+  border: 2px dashed rgba(135, 163, 174, 0.45);
+  color: rgba(135, 163, 174, 0.8);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.trilha {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(135, 163, 174, 0.2);
+}
+
+.trilha__cabecalho {
+  margin-bottom: 0.4rem;
+  font-size: 0.68rem;
+}
+
+.trilha__barra {
+  height: 0.9rem;
+  padding: 2px;
+  border: 1px solid rgba(135, 163, 174, 0.3);
+  border-radius: 999px;
+  background: #0B1C2D;
+  overflow: hidden;
+}
+
+.trilha__preenchido {
+  width: 0;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--amarelo), var(--verde), var(--amarelo));
+  transition: width 1s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+/* --- frase, botão e rodapé ----------------------------------------------- */
+
+.resultado__frase--modulo {
+  max-width: 28rem;
+  font-size: clamp(0.85rem, 2.9vw, 1rem);
+  color: rgba(249, 241, 229, 0.9);
+}
+
+.modulo__acao {
+  margin-top: 0.2rem;
+}
+
+.botao--grande {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95em 2.2em;
+  font-size: clamp(1rem, 3.4vw, 1.15rem);
+  box-shadow: 0 7px 0 #C9A200, 0 14px 24px rgba(0, 0, 0, 0.35);
+}
+
+.botao--grande:hover { box-shadow: 0 9px 0 #C9A200, 0 18px 28px rgba(0, 0, 0, 0.4); }
+.botao--grande:active { box-shadow: 0 2px 0 #C9A200, 0 6px 14px rgba(0, 0, 0, 0.25); }
+
+.botao__seta { font-size: 1.15em; line-height: 1; }
+
+.modulo__rodape {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 56rem;
+  margin: 1rem 0 0;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(135, 163, 174, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.3rem 1rem;
+  font-size: 0.72rem;
+}
+
+.modulo__marca {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--creme);
+}
+
+.modulo__marca::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--amarelo);
+}
+
+.modulo__lema {
+  font-weight: 700;
+  color: rgba(255, 210, 31, 0.9);
+}
+
+/* --- entrada em cascata -------------------------------------------------- */
+/* Mesmo mecanismo da tela final: a seção sai de display:none e é isso que
+   dispara as animações, inclusive no segundo e no terceiro bloco. O keyframe
+   surgir está declarado no bloco da tela 5. */
+
+.modulo__conteudo > .faixa,
+.modulo__conteudo > .impacto,
+.modulo__conteudo > .modulo__completou,
+.modulo__conteudo > .placar--modulo,
+.modulo__conteudo > .painel,
+.modulo__conteudo > .resultado__frase--modulo,
+.modulo__conteudo > .modulo__acao {
+  animation: surgir 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.modulo__conteudo > .faixa { animation-delay: 120ms; }
+.modulo__conteudo > .impacto { animation-delay: 200ms; }
+.modulo__conteudo > .modulo__completou { animation-delay: 280ms; }
+.modulo__conteudo > .placar--modulo { animation-delay: 360ms; }
+.modulo__conteudo > .painel { animation-delay: 440ms; }
+.modulo__conteudo > .resultado__frase--modulo { animation-delay: 560ms; }
+.modulo__conteudo > .modulo__acao { animation-delay: 900ms; }
+
+/* --- desktop e projetor -------------------------------------------------- */
+
+@media (min-width: 900px) {
+  .modulo__conteudo { gap: 0.7rem; }
+}
+
+/* --- movimento reduzido -------------------------------------------------- */
+/* O bloco geral lá de cima zera duração e repetição; aqui as animações saem
+   de vez, para nada depender de um quadro final de fill. O rotate estático
+   da faixa fica: é desenho, não movimento. */
+
+/* Sem opacity aqui: não é preciso. Sem animação não sobra fill segurando o
+   opacity: 0 do primeiro quadro, e um "!important" nesse eixo já derrubou
+   antes a transparência de um enfeite de fundo. */
+@media (prefers-reduced-motion: reduce) {
+  .modulo__conteudo > *,
+  .gema {
+    animation: none !important;
+  }
+
+  .faixa--perfeita::after { display: none; }
+  .trilha__preenchido { transition: none !important; }
+}
+
+/* ==========================================================================
+   2. Transição de módulo — identificação do bloco
+
+   Reprodução do mockup em assets/tela-identificacao-modulo/ (screen.png), em
+   CSS puro: o original puxa Poppins do Google Fonts, e isso não entra em
+   runtime aqui. Diferenças de propósito:
+
+   - sem a barra "Simulador MIVA": era a casca de teste do mockup;
+   - fundo limpo, a pedido do dono do projeto: sem a roda de raios, sem as
+     ondas de radar e sem o canvas de partículas correndo o tempo todo. Fica
+     o degradê navy, e os confetes entram uma vez, na chegada;
+   - "+50 Sabedoria" virou "Sem cronômetro" — o quiz não tem moeda;
+   - sem os sons sintetizados e sem o clique elástico no emblema, que não é
+     botão;
+   - as frases dos eixos são as do quiz.js, não as do mockup;
+   - os pesos 800/900 viram 700, o único bold que a Poppins self-hosted traz.
+   ========================================================================== */
+
+.tela--transicao {
+  position: relative;
+  gap: 0;
+  color: var(--creme);
+  text-align: center;
+  background: radial-gradient(circle at 50% 42%, var(--navy) 0%, var(--navy-fundo) 75%);
+}
+
+.transicao__conteudo {
+  margin-block: auto;                 /* centraliza e empurra o rodapé */
+  width: 100%;
+  max-width: 42rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+/* --- 1. pílula de etapa -------------------------------------------------- */
+
+@keyframes etapa-ponto {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.4); opacity: 0.5; }
+}
+
+.etapa {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1.1rem;
+  border: 2px solid var(--azul-medio);
+  border-radius: 999px;
+  background: rgba(24, 56, 80, 0.7);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  font-size: clamp(0.75rem, 2.6vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--azul-borda);
+}
+
+.etapa strong { color: var(--amarelo); }
+
+.etapa__ponto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--amarelo);
+  box-shadow: 0 0 10px var(--amarelo);
+  animation: etapa-ponto 1.5s ease-in-out infinite;
+}
+
+/* --- 2. emblema ---------------------------------------------------------- */
+/* Tudo sai de --lado, o tamanho da caixa creme: no celular ela encolhe e o
+   resto acompanha. */
+
+@keyframes emblema-chegar {
+  0%   { opacity: 0; transform: scale(0.2) translateY(-60px) rotate(-20deg); }
+  60%  { opacity: 1; transform: scale(1.15) translateY(10px) rotate(5deg); }
+  80%  { transform: scale(0.95) translateY(-5px) rotate(-2deg); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes emblema-flutuar {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8%); }
+}
+
+@keyframes emblema-sombra {
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50%      { transform: scale(0.85); opacity: 0.25; }
+}
+
+@keyframes emblema-brilho {
+  0%   { transform: scale(0.7) rotate(0); opacity: 0.5; }
+  100% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+}
+
+@keyframes emblema-badge {
+  0%   { opacity: 0; transform: scale(0.4); }
+  70%  { opacity: 1; transform: scale(1.15); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.emblema {
+  --lado: 108px;
+  position: relative;
+  width: calc(var(--lado) + 20px);
+  height: calc(var(--lado) + 20px);
+  margin-block: 0.3rem 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emblema__sombra {
+  position: absolute;
+  bottom: -12px;
+  width: 80%;
+  height: 18%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  filter: blur(8px);
+  animation: emblema-sombra 3s ease-in-out infinite;
+}
+
+/* A borda de baixo em bege mais escuro é o que faz a caixa ler como peça
+   3D. Mesmo tom do mockup. */
+.emblema__caixa {
+  position: relative;
+  width: var(--lado);
+  height: var(--lado);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid #FFFFFF;
+  border-radius: 27%;
+  background: linear-gradient(145deg, #FFFFFF, var(--creme));
+  box-shadow:
+    0 9px 0 #C2B79E,
+    0 16px 26px rgba(0, 0, 0, 0.45),
+    inset 0 -6px 0 rgba(0, 0, 0, 0.08);
+  animation: emblema-flutuar 3s ease-in-out infinite;
+}
+
+.emblema__icone {
+  display: none;
+  width: 60%;
+  height: 60%;
+  filter: drop-shadow(0 4px 6px rgba(24, 56, 80, 0.25));
+}
+
+.tela--transicao[data-eixo="alerta"] .emblema__icone--alerta,
+.tela--transicao[data-eixo="preparacao"] .emblema__icone--preparacao,
+.tela--transicao[data-eixo="durante"] .emblema__icone--durante { display: block; }
+
+.emblema__icone .cor-navy    { fill: var(--navy); }
+.emblema__icone .cor-azul    { fill: var(--azul-medio); }
+.emblema__icone .cor-amarelo { fill: var(--amarelo); }
+.emblema__icone .cor-verde   { fill: var(--verde); }
+
+.emblema__icone [class^="traco-"] {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.emblema__icone .traco-verde   { stroke: var(--verde); }
+.emblema__icone .traco-azul    { stroke: var(--azul-medio); stroke-width: 4; }
+.emblema__icone .traco-amarelo { stroke: var(--amarelo); stroke-width: 4; }
+
+.emblema__brilho {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  fill: var(--amarelo);
+  filter: drop-shadow(0 0 6px rgba(255, 210, 31, 0.7));
+  animation: emblema-brilho 4s ease-in-out infinite alternate;
+}
+
+.emblema__brilho--1 { top: -4px; right: 2px; animation-delay: 0.2s; }
+.emblema__brilho--2 { bottom: 16px; left: -12px; animation-delay: 0.9s; }
+.emblema__brilho--3 { top: 24px; left: -8px; width: 12px; height: 12px; animation-delay: 1.4s; }
+
+.emblema__badge {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid var(--navy-fundo);
+  border-radius: 50%;
+  background: var(--amarelo);
+  box-shadow: 0 4px 0 #C9A200, 0 8px 15px rgba(0, 0, 0, 0.3);
+  color: var(--navy);
+  font-size: 0.9rem;
+  font-weight: 700;
+  animation: emblema-badge 500ms 600ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+/* --- 3. título e 4. frase ------------------------------------------------ */
+
+.transicao__titulo {
+  margin: 0;
+  max-width: 18ch;
+  font-size: clamp(1.9rem, 8.5vw, 4.2rem);
+  line-height: 1.08;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--amarelo);
+  text-shadow: 0 4px 0 #C9A200, 0 8px 25px rgba(255, 210, 31, 0.35);
+}
+
+/* O brilho que atravessa o título. No mockup ele era uma faixa branca por
+   cima da caixa inteira e aparecia solta no navy, fora das letras; aqui o
+   degradê é recortado pelo próprio texto. Sem background-clip: text, fica o
+   amarelo chapado lá de cima — nunca texto transparente. A sombra passa para
+   drop-shadow porque text-shadow apareceria através da letra vazada. */
+@keyframes titulo-brilho {
+  0%        { background-position: 100% 0; }
+  30%, 100% { background-position: 0 0; }
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .transicao__titulo {
+    color: transparent;
+    text-shadow: none;
+    background-image: linear-gradient(105deg,
+                      var(--amarelo) 42%, #FFF6C8 50%, var(--amarelo) 58%);
+    background-size: 300% 100%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    filter: drop-shadow(0 4px 0 #C9A200) drop-shadow(0 8px 18px rgba(255, 210, 31, 0.3));
+  }
+}
+
+.transicao__frase {
+  margin: 0;
+  max-width: 32rem;
+  font-size: clamp(1rem, 3.2vw, 1.3rem);
+  line-height: 1.45;
+  text-wrap: balance;                 /* sem palavra órfã na segunda linha */
+}
+
+/* --- 5. metas ------------------------------------------------------------ */
+/* No celular as duas metas lado a lado passam de 360px, então empilham. */
+
+.metas {
+  list-style: none;
+  margin: 0.2rem 0 0.6rem;
+  padding: 0.8rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border: 2px solid var(--azul-forte);
+  border-radius: var(--raio);
+  background: rgba(19, 47, 69, 0.85);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-align: left;
+}
+
+.meta + .meta {
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(135, 163, 174, 0.25);
+}
+
+.meta__icone {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.meta__icone--perguntas {
+  border: 1px solid var(--verde);
+  background: rgba(172, 184, 36, 0.25);
+  color: var(--verde);
+}
+
+.meta__icone--ritmo {
+  border: 1px solid var(--amarelo);
+  background: rgba(255, 210, 31, 0.2);
+}
+
+.meta__icone--ritmo svg {
+  fill: none;
+  stroke: var(--amarelo);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.meta__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.meta__rotulo {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--azul-borda);
+}
+
+.meta__info b { font-size: 0.95rem; }
+
+@media (min-width: 480px) {
+  .metas {
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.85rem 1.5rem;
+  }
+
+  .meta + .meta {
+    padding: 0 0 0 1.25rem;
+    border-top: 0;
+    border-left: 1px solid rgba(135, 163, 174, 0.25);
+  }
+}
+
+/* --- 6. botão e dica de teclado ------------------------------------------ */
+
+.transicao__acao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.transicao__acao .botao {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Só onde existe mouse — e portanto, quase sempre, teclado. No celular a
+   dica falaria de teclas que não estão lá. */
+.dica-teclado {
+  display: none;
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--azul-borda);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dica-teclado { display: block; }
+}
+
+.dica-teclado kbd {
+  padding: 0.15rem 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--creme);
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* --- entrada em cascata -------------------------------------------------- */
+/* Mesmo mecanismo das telas de resultado: a seção sai de display:none e é
+   isso que dispara as animações, a cada bloco. O keyframe surgir está
+   declarado no bloco da tela 5. */
+
+.transicao__conteudo > .etapa,
+.transicao__conteudo > .transicao__frase,
+.transicao__conteudo > .metas,
+.transicao__conteudo > .transicao__acao {
+  animation: surgir 520ms cubic-bezier(0.2, 0.7, 0.3, 1) both;
+}
+
+.transicao__conteudo > .etapa { animation-delay: 100ms; }
+.transicao__conteudo > .transicao__frase { animation-delay: 550ms; }
+.transicao__conteudo > .metas { animation-delay: 700ms; }
+.transicao__conteudo > .transicao__acao { animation-delay: 850ms; }
+
+.transicao__conteudo > .emblema {
+  animation: emblema-chegar 750ms 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+.transicao__conteudo > .transicao__titulo {
+  animation:
+    surgir 600ms 400ms cubic-bezier(0.2, 0.7, 0.3, 1) both,
+    titulo-brilho 5s 1.5s infinite;
+}
+
+/* --- desktop e projetor -------------------------------------------------- */
+
+@media (min-width: 900px) {
+  .transicao__conteudo { gap: 1.1rem; }
+  .emblema { --lado: 150px; margin-block: 0.4rem 0.8rem; }
+  .emblema__brilho { width: 22px; height: 22px; }
+  .emblema__brilho--3 { width: 14px; height: 14px; }
+  .emblema__badge { width: 44px; height: 44px; font-size: 0.95rem; }
+}
+
+/* --- movimento reduzido -------------------------------------------------- */
+/* O bloco geral lá de cima zera duração e repetição; aqui as animações saem
+   de vez. O título fica com o brilho parado fora das letras, isto é, amarelo
+   chapado. */
+
+@media (prefers-reduced-motion: reduce) {
+  .transicao__conteudo > *,
+  .etapa__ponto,
+  .emblema__sombra,
+  .emblema__caixa,
+  .emblema__brilho,
+  .emblema__badge {
+    animation: none !important;
   }
 }

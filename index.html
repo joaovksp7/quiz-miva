@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Missão Clima — Enchentes e deslizamentos</title>
-<meta name="description" content="Quiz educativo sobre enchentes e deslizamentos, do MIVA — Memorial das Inundações nos Vales.">
+<title>Missão Clima — Inundações e deslizamentos</title>
+<meta name="description" content="Quiz educativo sobre inundações e deslizamentos, do MIVA — Memorial das Inundações nos Vales.">
 <!-- Gerado por scripts/empacotar.py: a Poppins embutida em base64. Vem antes
      do style.css porque é a mesma família que ele usa. -->
 <link rel="stylesheet" href="fontes.css">
@@ -17,10 +17,10 @@
   <!-- 1. Abertura — reproduz a capa do slide 1 -->
   <section id="tela-abertura" class="tela" hidden aria-labelledby="titulo-abertura">
     <h1 id="titulo-abertura" class="oculto-visual">
-      Missão Clima — Enchentes e deslizamentos
+      Missão Clima — Inundações e deslizamentos
     </h1>
     <img class="capa" src="assets/capa.webp" width="1402" height="854"
-         alt="Missão Clima, enchentes e deslizamentos. Dois estudantes observam uma
+         alt="Missão Clima, inundações e deslizamentos. Dois estudantes observam uma
               rua alagada de um lado e um deslizamento de encosta do outro. O clima
               muda, os riscos aumentam, o conhecimento te prepara.">
     <div class="abertura__acao">
@@ -33,14 +33,107 @@
     </div>
   </section>
 
-  <!-- 2. Transição de módulo — reproduz os divisores dos slides 2, 14 e 31 -->
-  <section id="tela-transicao" class="tela" hidden aria-labelledby="transicao-titulo">
-    <p class="transicao__etapa">
-      Bloco <span id="transicao-numero">1</span> de 3
+  <!-- 2. Transição de módulo — nomeia o eixo dos divisores dos slides 2, 14 e
+       31, no desenho de assets/tela-identificacao-modulo/screen.png -->
+  <section id="tela-transicao" class="tela tela--transicao" hidden aria-labelledby="transicao-titulo">
+    <div class="transicao__conteudo">
+      <!-- 1. Pílula de etapa -->
+      <p class="etapa">
+        <span class="etapa__ponto" aria-hidden="true"></span>
+        <span>Etapa <strong><span id="transicao-numero">1</span> de 3</strong></span>
+      </p>
+
+      <!-- 2. Emblema do eixo. Os três ícones ficam aqui e o CSS mostra só o do
+           data-eixo que o quiz.js grava na seção. É decoração: o título já
+           diz qual é o bloco. -->
+      <div class="emblema" aria-hidden="true">
+        <span class="emblema__sombra"></span>
+        <svg class="emblema__brilho emblema__brilho--1" viewBox="0 0 24 24">
+          <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+        </svg>
+        <svg class="emblema__brilho emblema__brilho--2" viewBox="0 0 24 24">
+          <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+        </svg>
+        <svg class="emblema__brilho emblema__brilho--3" viewBox="0 0 24 24">
+          <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+        </svg>
+
+        <div class="emblema__caixa">
+          <!-- alerta: sino -->
+          <svg class="emblema__icone emblema__icone--alerta" viewBox="0 0 64 64">
+            <path class="cor-navy" d="M32 8C23.16 8 16 15.16 16 24V38L10 46H54L48 38V24C48 15.16 40.84 8 32 8Z"/>
+            <path class="cor-azul" d="M32 4C20.95 4 12 12.95 12 24V36L8 44C6.5 47 8.67 50 12 50H52C55.33 50 57.5 47 56 44L52 36V24C52 12.95 43.05 4 32 4ZM44 38L47 42H17L20 38V24C20 17.37 25.37 12 32 12C38.63 12 44 17.37 44 24V38Z"/>
+            <path class="cor-amarelo" d="M26 52C26 55.31 28.69 58 32 58C35.31 58 38 55.31 38 52H26Z"/>
+            <circle class="cor-amarelo" cx="32" cy="24" r="5"/>
+            <path class="traco-verde" d="M20 12C16 16 14 20 14 26"/>
+            <path class="traco-verde" d="M44 12C48 16 50 20 50 26"/>
+          </svg>
+          <!-- preparacao: mochila de emergência -->
+          <svg class="emblema__icone emblema__icone--preparacao" viewBox="0 0 64 64">
+            <rect class="cor-navy" x="16" y="16" width="32" height="40" rx="12"/>
+            <path class="traco-azul" d="M22 16V10C22 6.69 24.69 4 28 4H36C39.31 4 42 6.69 42 10V16"/>
+            <rect class="cor-azul" x="20" y="28" width="24" height="22" rx="6"/>
+            <path class="traco-amarelo" d="M32 34V44M27 39H37"/>
+            <rect class="cor-verde" x="10" y="30" width="6" height="18" rx="3"/>
+            <rect class="cor-verde" x="48" y="30" width="6" height="18" rx="3"/>
+          </svg>
+          <!-- durante: escudo -->
+          <svg class="emblema__icone emblema__icone--durante" viewBox="0 0 64 64">
+            <path class="cor-navy" d="M32 6L12 14V30C12 43.6 20.6 54.2 32 58C43.4 54.2 52 43.6 52 30V14L32 6Z"/>
+            <path class="cor-azul" d="M32 10L16 16.4V29.5C16 40.8 22.8 49.5 32 52.8C41.2 49.5 48 40.8 48 29.5V16.4L32 10Z"/>
+            <path class="cor-amarelo" d="M34 16L24 32H33L30 46L42 28H33L36 16H34Z"/>
+          </svg>
+        </div>
+
+        <span class="emblema__badge" id="transicao-badge">1</span>
+      </div>
+
+      <!-- 3. Título do eixo e 4. frase -->
+      <h2 class="transicao__titulo" id="transicao-titulo"></h2>
+      <p class="transicao__frase" id="transicao-frase"></p>
+
+      <!-- 5. Metas do bloco. No mockup a segunda era "+50 Sabedoria"; o quiz
+           não tem moeda, então entra uma regra que existe de verdade. -->
+      <ul class="metas">
+        <li class="meta">
+          <span class="meta__icone meta__icone--perguntas" aria-hidden="true">5Q</span>
+          <span class="meta__info">
+            <span class="meta__rotulo">Desafio</span>
+            <b>5 perguntas</b>
+          </span>
+        </li>
+        <li class="meta">
+          <span class="meta__icone meta__icone--ritmo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <circle cx="12" cy="13" r="8"/>
+              <path d="M12 9v4l2.5 2.5M9.5 2h5"/>
+            </svg>
+          </span>
+          <span class="meta__info">
+            <span class="meta__rotulo">Ritmo</span>
+            <b>Sem cronômetro</b>
+          </span>
+        </li>
+      </ul>
+
+      <!-- 6. Botão. O foco já vai para ele, então Enter e Espaço funcionam
+           sem atalho próprio; a dica só aparece onde existe teclado. -->
+      <div class="transicao__acao">
+        <button type="button" id="btn-iniciar-modulo" class="botao botao--grande">
+          <span>Começar o bloco</span>
+          <span class="botao__seta" aria-hidden="true">➔</span>
+        </button>
+        <p class="dica-teclado" aria-hidden="true">
+          Pressione <kbd>Enter</kbd> ou <kbd>Espaço</kbd> para iniciar
+        </p>
+      </div>
+    </div>
+
+    <!-- Mesmo rodapé do resultado do módulo. -->
+    <p class="modulo__rodape">
+      <span class="modulo__marca">Missão Clima · MIVA</span>
+      <span class="modulo__lema">Conhecimento que salva vidas!</span>
     </p>
-    <h2 class="transicao__titulo" id="transicao-titulo"></h2>
-    <p class="transicao__frase" id="transicao-frase"></p>
-    <button type="button" id="btn-iniciar-modulo" class="botao">Começar o bloco</button>
   </section>
 
   <!-- 3. Pergunta -->
@@ -71,14 +164,65 @@
     </p>
   </section>
 
-  <!-- 4. Resultado do módulo -->
-  <section id="tela-modulo" class="tela" hidden aria-labelledby="modulo-titulo">
-    <h2 class="resultado__titulo" id="modulo-titulo"></h2>
-    <p class="placar">
-      <span id="modulo-acertos">0</span><span class="placar__de"> de 5</span>
+  <!-- 4. Resultado do módulo — reproduz assets/tela-finalizacao-modulo/screen.png -->
+  <section id="tela-modulo" class="tela tela--modulo" hidden aria-labelledby="modulo-impacto">
+    <!-- Mesmo fundo prismático da tela final, montado pelo fundo-prisma.js.
+         É decoração: sem WebGL2 fica o degradê que o .prisma pinta no CSS. -->
+    <div class="prisma" id="prisma-modulo" aria-hidden="true"></div>
+
+    <div class="modulo__conteudo">
+      <!-- 1. Faixa de impacto e títulos -->
+      <p class="faixa" id="modulo-faixa">
+        <span aria-hidden="true">⚡</span>
+        <span id="modulo-faixa-texto"></span>
+        <span aria-hidden="true">⚡</span>
+      </p>
+
+      <h2 class="impacto" id="modulo-impacto"></h2>
+      <p class="modulo__completou">
+        Você completou: <span class="modulo__eixo" id="modulo-titulo"></span>
+      </p>
+
+      <!-- 2. Placar do bloco -->
+      <p class="placar placar--modulo">
+        <span class="placar__numero" id="modulo-acertos">0</span>
+        <span class="placar__de">/ 5</span>
+        <span class="placar__rotulo">acertos</span>
+      </p>
+
+      <!-- 3. Painel: uma cápsula por pergunta e o progresso da missão -->
+      <div class="painel">
+        <p class="painel__cabecalho">
+          <span>Perguntas do bloco</span>
+          <b id="modulo-precisao"></b>
+        </p>
+        <ul class="gemas" id="modulo-gemas"></ul>
+        <div class="trilha">
+          <p class="trilha__cabecalho">
+            <span>Progresso da Missão Clima</span>
+            <b id="modulo-progresso"></b>
+          </p>
+          <div class="trilha__barra">
+            <div class="trilha__preenchido" id="modulo-barra"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Frase de feedback e 5. botão de avançar -->
+      <p class="resultado__frase resultado__frase--modulo" id="modulo-frase"></p>
+
+      <div class="modulo__acao">
+        <button type="button" id="btn-seguir" class="botao botao--grande">
+          <span id="btn-seguir-texto">Seguir</span>
+          <span class="botao__seta" aria-hidden="true">➔</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="modulo__rodape">
+      <span class="modulo__marca">Missão Clima · MIVA</span>
+      <span class="modulo__lema">Conhecimento que salva vidas!</span>
     </p>
-    <p class="resultado__frase" id="modulo-frase"></p>
-    <button type="button" id="btn-seguir" class="botao">Seguir</button>
   </section>
 
   <!-- 5. Resultado final -->
@@ -118,8 +262,10 @@
 <!-- Espelho do perguntas.json. Só é usado quando o fetch não pode rodar,
      isto é, quando a página foi aberta direto do disco. Gerado, não editar. -->
 <script src="perguntas.js"></script>
-<!-- Fundo da tela de resultado. Vem antes do quiz.js, que é quem o monta. -->
+<!-- Fundo das telas de resultado. Vem antes do quiz.js, que é quem o monta. -->
 <script src="fundo-prisma.js"></script>
+<!-- Confetes do resultado do módulo. Enfeite: se não carregar, o quiz roda. -->
+<script src="confetes.js"></script>
 <script src="quiz.js"></script>
 </body>
 </html>

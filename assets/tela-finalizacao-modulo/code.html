@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Mockup — Conclusão de Módulo Gamificada (Missão Clima)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&amp;family=Fredoka:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          navy: '#183850',
+          'navy-escuro': '#102738',
+          'navy-fundo': '#0B1C2D',
+          creme: '#F9F1E5',
+          'azul-borda': '#87A3AE',
+          'azul-medio': '#4E8AB2',
+          'azul-forte': '#3A6F92',
+          amarelo: '#FFD21F',
+          'amarelo-sombra': '#C99E00',
+          verde: '#ACB824',
+          'verde-sombra': '#7B8512',
+          'verde-texto': '#5E6A0F',
+          vermelho: '#E53E3E',
+          'vermelho-sombra': '#9B1C1C'
+        },
+        fontFamily: {
+          sans: ['Poppins', 'system-ui', 'sans-serif'],
+          cartoon: ['Fredoka', 'Poppins', 'sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  :root {
+    --navy: #183850;
+    --navy-fundo: #0B1C2D;
+    --creme: #F9F1E5;
+    --azul-borda: #87A3AE;
+    --azul-medio: #4E8AB2;
+    --azul-forte: #3A6F92;
+    --amarelo: #FFD21F;
+    --amarelo-sombra: #C99E00;
+    --verde: #ACB824;
+    --verde-sombra: #7B8512;
+  }
+
+  body {
+    background: radial-gradient(circle at 50% 25%, #1d4b70 0%, #0e273d 55%, #081624 100%);
+    font-family: 'Poppins', sans-serif;
+    color: var(--creme);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animações Duolingo Pop & Bounce */
+  @keyframes bouncyEntrance {
+    0% {
+      opacity: 0;
+      transform: scale(0.1) rotate(-16deg);
+    }
+    45% {
+      opacity: 1;
+      transform: scale(1.24) rotate(6deg);
+    }
+    65% {
+      transform: scale(0.92) rotate(-3deg);
+    }
+    82% {
+      transform: scale(1.06) rotate(1deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
+  }
+
+  @keyframes mascotFloat {
+    0%, 100% {
+      transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateY(-8px) rotate(2deg);
+    }
+  }
+
+  @keyframes rotateSunburst {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes popUpBubble {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.35); opacity: 1; }
+    80% { transform: scale(0.88); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes shineSweep {
+    0% { transform: translateX(-150%) skewX(-25deg); }
+    100% { transform: translateX(250%) skewX(-25deg); }
+  }
+
+  @keyframes pulseStar {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.18) rotate(12deg); }
+  }
+
+  .anim-emblema-bouncy {
+    animation: bouncyEntrance 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .anim-mascote-loop {
+    animation: mascotFloat 3.2s ease-in-out infinite;
+  }
+
+  .anim-sunburst {
+    animation: rotateSunburst 28s linear infinite;
+  }
+
+  .anim-star-pop {
+    animation: pulseStar 2.2s ease-in-out infinite;
+  }
+
+  /* Botão 3D estilo Duolingo */
+  .duo-button-3d {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border-radius: 9999px;
+    background: #FFD21F;
+    color: #183850;
+    border: none;
+    box-shadow: 0 7px 0 #C99E00, 0 14px 24px rgba(0,0,0,0.35);
+    transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .duo-button-3d:hover {
+    filter: brightness(1.05);
+    transform: translateY(-2px);
+    box-shadow: 0 9px 0 #C99E00, 0 18px 28px rgba(0,0,0,0.4);
+  }
+
+  .duo-button-3d:active {
+    transform: translateY(5px);
+    box-shadow: 0 2px 0 #C99E00, 0 6px 14px rgba(0,0,0,0.25);
+  }
+
+  /* Pill/Gemas 3D para acertos */
+  .gema-acerto {
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+  }
+  .gema-acerto.acertou {
+    background: linear-gradient(180deg, #D5E232 0%, #ACB824 100%);
+    box-shadow: 0 4px 0 #7B8512, 0 0 16px rgba(172, 184, 36, 0.45);
+    color: #183850;
+    animation: popUpBubble 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .gema-acerto.errou {
+    background: #142e44;
+    border: 2px dashed rgba(135, 163, 174, 0.4);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+    color: #87A3AE;
+  }
+
+  /* Faixa de Módulo Perfeito estilo Duolingo */
+  .banner-perfeito {
+    background: linear-gradient(90deg, #FFB800 0%, #FFD21F 50%, #FFB800 100%);
+    box-shadow: 0 4px 0 #B78200, 0 8px 20px rgba(0,0,0,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .banner-perfeito::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(90deg, transparent 20%, rgba(255,255,255,0.6) 50%, transparent 80%);
+    animation: shineSweep 2.5s infinite;
+  }
+
+  .botao-modo {
+    transition: all 0.15s ease;
+  }
+  .botao-modo.ativo {
+    background: #FFD21F;
+    color: #183850;
+    font-weight: 700;
+    box-shadow: 0 2px 0 #C99E00;
+  }
+
+  /* Canvas de Confetes cobrindo toda a tela */
+  #canvas-confetes {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 50;
+  }
+</style>
+</head>
+<body class="flex flex-col items-center justify-between p-3 md:p-6 min-h-screen relative selection:bg-amarelo selection:text-navy">
+<!-- Canvas para partículas e confetes Duolingo -->
+<canvas id="canvas-confetes"></canvas>
+<!-- Barra de Controle Interativa para Testes -->
+<header class="w-full max-w-4xl z-20 bg-navy/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border-2 border-azul-borda/30 flex flex-wrap items-center justify-between gap-2 shadow-2xl mb-2">
+<div class="flex items-center gap-2">
+<div class="w-2.5 h-2.5 rounded-full bg-verde animate-ping"></div>
+<span class="text-xs uppercase font-extrabold tracking-wider text-creme flex items-center gap-1.5">
+        🎮 Simulador Gamificado
+      </span>
+</div>
+<!-- Seletor de Eixo -->
+<div class="flex items-center gap-1 bg-navy-escuro/90 p-1 rounded-xl border border-azul-borda/25 text-xs">
+<span class="px-2 text-azul-borda font-semibold">Bloco:</span>
+<button class="botao-modo px-2.5 py-1 rounded-lg text-creme/90 ativo" id="btn-eixo-0" onclick="mudarEixo(0)">1: Alertas!</button>
+<button class="botao-modo px-2.5 py-1 rounded-lg text-creme/90" id="btn-eixo-1" onclick="mudarEixo(1)">2: Preparação</button>
+<button class="botao-modo px-2.5 py-1 rounded-lg text-creme/90" id="btn-eixo-2" onclick="mudarEixo(2)">3: Durante</button>
+</div>
+<!-- Seletor de Acertos -->
+<div class="flex items-center gap-1 bg-navy-escuro/90 p-1 rounded-xl border border-azul-borda/25 text-xs">
+<span class="px-2 text-azul-borda font-semibold">Acertos:</span>
+<button class="botao-modo px-2 py-1 rounded-lg text-creme/90 ativo" id="btn-pts-5" onclick="mudarPontos(5)">5/5 ★</button>
+<button class="botao-modo px-2 py-1 rounded-lg text-creme/90" id="btn-pts-4" onclick="mudarPontos(4)">4/5</button>
+<button class="botao-modo px-2 py-1 rounded-lg text-creme/90" id="btn-pts-3" onclick="mudarPontos(3)">3/5</button>
+<button class="botao-modo px-2 py-1 rounded-lg text-creme/90" id="btn-pts-1" onclick="mudarPontos(1)">1/5</button>
+</div>
+<!-- Áudio & Replay -->
+<div class="flex items-center gap-2">
+<button class="text-xs font-bold text-creme/80 hover:text-amarelo px-2 py-1 flex items-center gap-1 rounded bg-navy-escuro/60 border border-azul-borda/20" id="btn-som" onclick="alternarSom()" title="Ativar/Desativar Efeitos Sonoros">
+<span id="icone-som">🔊</span> Efeitos
+      </button>
+<button class="text-xs font-black text-amarelo hover:brightness-110 bg-navy-escuro px-3 py-1.5 rounded-lg border border-amarelo/40 shadow-sm flex items-center gap-1" onclick="reiniciarComemoracao(true)">
+<span>↻</span> Repetir Show!
+      </button>
+</div>
+</header>
+<!-- Palco da Celebração Duolingo -->
+<main class="w-full max-w-xl my-auto z-10 flex flex-col items-center text-center px-4 py-3 md:py-6 relative" id="card-modulo">
+<!-- Sunburst Radiante Giratório de Celebração Duolingo -->
+<div class="absolute -top-16 left-1/2 -translate-x-1/2 w-[420px] h-[420px] md:w-[540px] md:h-[540px] pointer-events-none flex items-center justify-center opacity-30 select-none overflow-visible">
+<svg class="w-full h-full anim-sunburst text-amarelo" fill="currentColor" viewbox="0 0 500 500">
+<!-- 24 raios triangulares clássicos de conquista -->
+<path d="M250 250 L230 0 L270 0 Z"></path>
+<path d="M250 250 L318 19 L351 40 Z"></path>
+<path d="M250 250 L394 67 L420 98 Z"></path>
+<path d="M250 250 L450 137 L466 173 Z"></path>
+<path d="M250 250 L480 220 L486 260 Z"></path>
+<path d="M250 250 L479 308 L457 344 Z"></path>
+<path d="M250 250 L435 388 L403 419 Z"></path>
+<path d="M250 250 L368 454 L330 476 Z"></path>
+<path d="M250 250 L287 493 L250 499 Z"></path>
+<path d="M250 250 L204 496 L168 480 Z"></path>
+<path d="M250 250 L126 450 L95 425 Z"></path>
+<path d="M250 250 L63 384 L41 349 Z"></path>
+<path d="M250 250 L19 302 L11 262 Z"></path>
+<path d="M250 250 L14 213 L28 174 Z"></path>
+<path d="M250 250 L49 129 L75 96 Z"></path>
+<path d="M250 250 L108 59 L141 34 Z"></path>
+<path d="M250 250 L181 13 L220 2 Z"></path>
+</svg>
+</div>
+<!-- Halo e glow de fundo -->
+<div class="absolute w-80 h-80 rounded-full bg-amarelo/20 blur-3xl -top-6 pointer-events-none animate-pulse"></div>
+<!-- 1. Emblema 3D Estilo Mascote / Medalha com "Squash & Stretch" -->
+<div class="relative mb-3 flex items-center justify-center anim-emblema-bouncy">
+<!-- Partículas de estrelinhas flutuantes ao redor do medalhão -->
+<span class="absolute -top-3 -left-6 text-2xl anim-star-pop select-none">✨</span>
+<span class="absolute top-2 -right-7 text-2xl anim-star-pop select-none" style="animation-delay: 0.7s">🌟</span>
+<span class="absolute -bottom-1 -left-5 text-xl anim-star-pop select-none" style="animation-delay: 1.3s">💫</span>
+<!-- Medalhão Cartunesco Duolingo-Style -->
+<div class="anim-mascote-loop relative">
+<div class="relative w-32 h-32 md:w-36 md:h-36 rounded-[2.5rem] bg-gradient-to-b from-[#FFFDF9] to-[#EAE0CD] border-4 border-creme shadow-[0_12px_0_#1d4563,0_20px_35px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center p-3 transform transition-transform" id="disco-emblema">
+<!-- Mascote MIVA estilizado ou Ícone com Expressão -->
+<div class="text-navy transform scale-110 drop-shadow-md" id="icone-modulo">
+<!-- Renderizado dinamicamente -->
+</div>
+<!-- Pílula de Bloco com Sombra 3D interna -->
+<div class="mt-2 text-[11px] font-black uppercase tracking-wider bg-navy text-amarelo px-3 py-1 rounded-full shadow-[0_2px_0_#0a1824] border border-amarelo/30" id="badge-etiqueta">
+            BLOCO 1
+          </div>
+</div>
+<!-- Mascote/Badge Estrela comemorativa 3D balançando no canto -->
+<div class="absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-gradient-to-b from-amarelo to-[#E0A800] text-navy font-black flex items-center justify-center text-xl shadow-[0_4px_0_#9E7500,0_8px_16px_rgba(0,0,0,0.35)] border-3 border-creme transform rotate-12 transition-transform hover:scale-110" id="badge-conquista">
+          ★
+        </div>
+</div>
+</div>
+<!-- Faixa Curva de Impacto (Apenas quando 5/5 ou título de impacto) -->
+<div class="w-full flex justify-center mb-1" id="container-faixa-impacto">
+<div class="banner-perfeito px-5 py-1 rounded-full text-navy font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-1.5 shadow-lg transform -rotate-1" id="faixa-impacto">
+<span>⚡</span> <span id="texto-faixa">MÓDULO PERFEITO!</span> <span>⚡</span>
+</div>
+</div>
+<!-- 2. Textos de Impacto & Módulo -->
+<div class="mt-1">
+<h1 class="text-3xl md:text-5xl font-black text-creme uppercase tracking-tight drop-shadow-[0_4px_12px_rgba(0,0,0,0.45)]" id="texto-impacto">
+        MANDOU BEM!
+      </h1>
+<p class="text-sm md:text-base font-bold text-azul-borda tracking-wide uppercase mt-1" id="modulo-titulo-sub">
+        Você completou: <span class="text-amarelo underline decoration-2 decoration-amarelo/50" id="modulo-nome">Alertas!</span>
+</p>
+</div>
+<!-- 3. Placar de Acertos + XP Gamificado -->
+<div class="my-2.5 flex items-center justify-center gap-4">
+<!-- Pontuação Principal -->
+<div class="flex items-baseline gap-1 bg-navy/80 px-4 py-1.5 rounded-2xl border-2 border-azul-borda/30 shadow-lg">
+<span class="text-4xl md:text-5xl font-black text-amarelo drop-shadow-[0_2px_8px_rgba(255,210,31,0.5)]" id="modulo-acertos">
+          5
+        </span>
+<span class="text-lg md:text-xl font-black text-creme/80">
+          / 5
+        </span>
+<span class="text-xs uppercase font-bold text-azul-borda ml-1">acertos</span>
+</div>
+<!-- Recompensa XP estilo Duolingo -->
+<div class="flex items-center gap-1.5 bg-gradient-to-r from-verde to-[#96A01A] text-navy px-3.5 py-2 rounded-2xl shadow-[0_4px_0_#6A730F,0_8px_16px_rgba(0,0,0,0.25)] font-black text-sm md:text-base transform transition-transform hover:scale-105" id="card-xp">
+<span class="text-lg">⚡</span>
+<span id="valor-xp">+50 SABEDORIA</span>
+</div>
+</div>
+<!-- 4. Barra de Sequência com Cápsulas 3D Gamificadas -->
+<div class="w-full max-w-sm my-2 bg-navy/90 p-3 rounded-2xl border-2 border-azul-borda/30 shadow-xl backdrop-blur-sm">
+<div class="flex items-center justify-between text-xs font-bold text-azul-borda mb-2 px-1">
+<span>Perguntas do Bloco</span>
+<span class="text-amarelo font-extrabold" id="resultado-aproveitamento">100% de Precisão!</span>
+</div>
+<!-- 5 Cápsulas / Gemas Estilo Duolingo -->
+<div class="grid grid-cols-5 gap-2 md:gap-3">
+<div class="gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20" id="gema-1">1</div>
+<div class="gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20" id="gema-2">2</div>
+<div class="gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20" id="gema-3">3</div>
+<div class="gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20" id="gema-4">4</div>
+<div class="gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20" id="gema-5">5</div>
+</div>
+<!-- Barra de Progresso Geral da Trilha (Ex: 33% -> 66%) -->
+<div class="mt-3 pt-2.5 border-t border-azul-borda/20 flex flex-col gap-1">
+<div class="flex justify-between text-[11px] font-bold text-azul-borda">
+<span>Progresso da Missão Clima</span>
+<span class="text-creme" id="progresso-percentual">33% completo</span>
+</div>
+<div class="w-full h-3.5 bg-navy-escuro rounded-full overflow-hidden border border-azul-borda/30 p-0.5 relative">
+<div class="h-full rounded-full bg-gradient-to-r from-amarelo via-verde to-amarelo transition-all duration-1000 shadow-inner relative" id="barra-trilha" style="width: 33%;">
+<div class="absolute inset-0 bg-white/25 rounded-full" style="animation: shineSweep 2s infinite linear;"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- 5. Frase Pedagógica de Feedback Incentivador -->
+<p class="text-xs md:text-sm text-creme/90 max-w-md font-medium leading-relaxed my-2 px-2 min-h-[40px] flex items-center justify-center" id="modulo-frase">
+      Você dominou todas as perguntas! Está preparado para identificar alertas climáticos e agir com segurança.
+    </p>
+<!-- 6. Botão CTA Gigante Tátil 3D Estilo Duolingo -->
+<div class="mt-3 w-full max-w-xs md:max-w-sm">
+<button class="duo-button-3d w-full py-4 text-base md:text-lg flex items-center justify-center gap-2" id="btn-seguir" onclick="cliqueContinuar()" type="button">
+<span id="btn-texto">CONTINUAR MISSÃO</span>
+<span class="text-xl">➔</span>
+</button>
+<div class="text-[11px] text-azul-borda/70 mt-1.5 font-medium tracking-wide">
+        Pressione espaço ou clique para avançar
+      </div>
+</div>
+</main>
+<!-- Rodapé Institucional Discreto -->
+<footer class="w-full max-w-4xl z-10 flex items-center justify-between py-2 border-t border-azul-borda/20 text-xs text-azul-borda mt-auto">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-amarelo"></span>
+<span class="font-black text-creme tracking-wider uppercase">Missão Clima · MIVA</span>
+</div>
+<span class="font-medium text-amarelo/90">Conhecimento que salva vidas!</span>
+</footer>
+<script>
+    // ==========================================
+    // SISTEMA DE ÁUDIO SINTETIZADO (Web Audio API)
+    // Sem dependência de arquivos externos mp3/wav
+    // ==========================================
+    let audioHabilitado = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function alternarSom() {
+      audioHabilitado = !audioHabilitado;
+      document.getElementById('icone-som').textContent = audioHabilitado ? '🔊' : '🔇';
+      document.getElementById('btn-som').classList.toggle('text-amarelo', audioHabilitado);
+      if (audioHabilitado) {
+        initAudio();
+        tocarNota(523.25, 0.1, 'sine'); // C5 bip teste
+      }
+    }
+
+    function tocarNota(freq, duracao, tipo = 'triangle', delay = 0) {
+      if (!audioHabilitado) return;
+      initAudio();
+      if (!audioCtx) return;
+
+      setTimeout(() => {
+        try {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = tipo;
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+          
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duracao);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start();
+          osc.stop(audioCtx.currentTime + duracao);
+        } catch(e) {}
+      }, delay);
+    }
+
+    function tocarFanfarraDuolingo(perfeito = true) {
+      if (!audioHabilitado) return;
+      initAudio();
+      if (perfeito) {
+        // Acorde alegre de nível concluído: C5 -> E5 -> G5 -> C6 com sustentação festiva
+        tocarNota(523.25, 0.18, 'triangle', 0);    // C5
+        tocarNota(659.25, 0.18, 'triangle', 120);  // E5
+        tocarNota(783.99, 0.22, 'triangle', 240);  // G5
+        tocarNota(1046.50, 0.55, 'sine', 380);     // C6 celebrativo
+      } else {
+        // Som alegre de progresso
+        tocarNota(440.00, 0.15, 'triangle', 0);    // A4
+        tocarNota(554.37, 0.18, 'triangle', 120);  // C#5
+        tocarNota(659.25, 0.35, 'sine', 240);      // E5
+      }
+    }
+
+    function tocarPopGema(index) {
+      if (!audioHabilitado) return;
+      // Frequência subindo a cada acerto estilo Duolingo
+      const escala = [440, 493.88, 554.37, 587.33, 659.25];
+      tocarNota(escala[index % escala.length], 0.12, 'sine');
+    }
+
+    // ==========================================
+    // DADOS E MOCKS DOS BLOCOS
+    // ==========================================
+    const EIXOS_MOCK = [
+      {
+        id: 'alerta',
+        titulo: 'Alertas!',
+        etiqueta: 'BLOCO 1 DE 3',
+        progressoTrilha: '33%',
+        proximoProgresso: '66%',
+        icone: `<svg class="w-14 h-14 md:w-16 md:h-16 text-navy drop-shadow" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0M3.124 7.5A8.969 8.969 0 015.292 3m13.416 0a8.969 8.969 0 012.168 4.5" />
+                </svg>`,
+        botaoTexto: 'IR PARA O BLOCO 2: PREPARAÇÃO'
+      },
+      {
+        id: 'preparacao',
+        titulo: 'Preparação',
+        etiqueta: 'BLOCO 2 DE 3',
+        progressoTrilha: '66%',
+        proximoProgresso: '100%',
+        icone: `<svg class="w-14 h-14 md:w-16 md:h-16 text-navy drop-shadow" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v1.081m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>`,
+        botaoTexto: 'IR PARA O BLOCO 3: DURANTE'
+      },
+      {
+        id: 'durante',
+        titulo: 'Durante o Evento',
+        etiqueta: 'BLOCO 3 DE 3',
+        progressoTrilha: '100%',
+        proximoProgresso: '100%',
+        icone: `<svg class="w-14 h-14 md:w-16 md:h-16 text-navy drop-shadow" fill="none" stroke="currentColor" stroke-width="2.3" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>`,
+        botaoTexto: 'VER RESULTADO FINAL DA MISSÃO'
+      }
+    ];
+
+    let estadoAtual = {
+      eixoIdx: 0,
+      pontos: 5
+    };
+
+    function obterFrases(pts) {
+      if (pts === 5) {
+        return {
+          impacto: 'IMPECÁVEL!',
+          faixa: 'MÓDULO PERFEITO!',
+          descricao: 'Incrível! Você acertou todas as 5 questões de primeira. Uma verdadeira referência em proteção comunitária!',
+          xp: '+50 SABEDORIA',
+          aproveitamento: '100% de Precisão!'
+        };
+      }
+      if (pts === 4) {
+        return {
+          impacto: 'MANDOU MUITO!',
+          faixa: 'QUASE PERFEITO!',
+          descricao: 'Excelente aproveitamento! Apenas um deslize pequeno, você está super preparado para proteger sua família.',
+          xp: '+40 SABEDORIA',
+          aproveitamento: '80% de Precisão!'
+        };
+      }
+      if (pts === 3) {
+        return {
+          impacto: 'BOM TRABALHO!',
+          faixa: 'BLOCO SUPERADO!',
+          descricao: 'Bom resultado! Você assimilou os pontos principais. Cada detalhe aprendido é segurança garantida na prática.',
+          xp: '+30 SABEDORIA',
+          aproveitamento: '60% de Precisão!'
+        };
+      }
+      return {
+        impacto: 'VALEU O TREINO!',
+        faixa: 'CONTINUE PRATICANDO!',
+        descricao: 'Missão concluída! Errar no treino é a melhor forma de acertar na vida real. Vale revisar as dicas deste bloco!',
+        xp: '+15 SABEDORIA',
+        aproveitamento: '20% de Precisão'
+      };
+    }
+
+    function contarPlacar(elemento, total, duracao) {
+      let inicio = null;
+      elemento.textContent = '0';
+      function passo(timestamp) {
+        if (!inicio) inicio = timestamp;
+        let progresso = Math.min((timestamp - inicio) / duracao, 1);
+        let suave = 1 - Math.pow(1 - progresso, 3);
+        elemento.textContent = String(Math.round(total * suave));
+        if (progresso < 1) {
+          requestAnimationFrame(passo);
+        }
+      }
+      requestAnimationFrame(passo);
+    }
+
+    function renderizarTela(comSom = false) {
+      const eixo = EIXOS_MOCK[estadoAtual.eixoIdx];
+      const pts = estadoAtual.pontos;
+      const feedback = obterFrases(pts);
+
+      // Atualiza textos
+      document.getElementById('modulo-nome').textContent = eixo.titulo;
+      document.getElementById('badge-etiqueta').textContent = eixo.etiqueta;
+      document.getElementById('icone-modulo').innerHTML = eixo.icone;
+      document.getElementById('btn-texto').textContent = eixo.botaoTexto;
+      document.getElementById('texto-impacto').textContent = feedback.impacto;
+      document.getElementById('texto-faixa').textContent = feedback.faixa;
+      document.getElementById('modulo-frase').textContent = feedback.descricao;
+      document.getElementById('valor-xp').textContent = feedback.xp;
+      document.getElementById('resultado-aproveitamento').textContent = feedback.aproveitamento;
+
+      // Barra de progresso da trilha
+      document.getElementById('progresso-percentual').textContent = `${eixo.progressoTrilha} concluído`;
+      const barraTrilha = document.getElementById('barra-trilha');
+      barraTrilha.style.width = '0%';
+      setTimeout(() => {
+        barraTrilha.style.width = eixo.progressoTrilha;
+      }, 250);
+
+      // Badge de Conquista no cantinho do medalhão
+      const badgeConquista = document.getElementById('badge-conquista');
+      if (pts === 5) {
+        badgeConquista.textContent = '★';
+        badgeConquista.className = 'absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-gradient-to-b from-amarelo to-[#E0A800] text-navy font-black flex items-center justify-center text-xl shadow-[0_4px_0_#9E7500,0_8px_16px_rgba(0,0,0,0.35)] border-3 border-creme transform rotate-12 transition-transform';
+      } else if (pts >= 3) {
+        badgeConquista.textContent = '✓';
+        badgeConquista.className = 'absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-gradient-to-b from-verde to-[#8D9616] text-navy font-black flex items-center justify-center text-xl shadow-[0_4px_0_#5B630B,0_8px_16px_rgba(0,0,0,0.35)] border-3 border-creme transform rotate-6 transition-transform';
+      } else {
+        badgeConquista.textContent = '!';
+        badgeConquista.className = 'absolute -bottom-3 -right-3 w-12 h-12 rounded-full bg-gradient-to-b from-azul-borda to-[#5B7B88] text-creme font-black flex items-center justify-center text-xl shadow-[0_4px_0_#3B5560,0_8px_16px_rgba(0,0,0,0.35)] border-3 border-creme transform rotate-0 transition-transform';
+      }
+
+      // Banner Perfeito
+      const bannerImpacto = document.getElementById('faixa-impacto');
+      if (pts === 5) {
+        bannerImpacto.className = 'banner-perfeito px-5 py-1.5 rounded-full text-navy font-black text-xs md:text-sm uppercase tracking-widest flex items-center gap-2 shadow-lg transform -rotate-1';
+      } else {
+        bannerImpacto.className = 'bg-navy-escuro border-2 border-azul-borda/40 px-4 py-1 rounded-full text-creme font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow';
+      }
+
+      // Animação de contagem numérica
+      contarPlacar(document.getElementById('modulo-acertos'), pts, 600);
+
+      // Renderiza as 5 Gemas 3D com "pop" escalonado e som interativo
+      for (let i = 1; i <= 5; i++) {
+        const gema = document.getElementById('gema-' + i);
+        gema.className = 'gema-acerto h-11 rounded-2xl flex items-center justify-center text-base font-black border border-white/20';
+        gema.textContent = '';
+        gema.style.transform = 'scale(0.8)';
+        gema.style.opacity = '0';
+
+        setTimeout(() => {
+          if (i <= pts) {
+            gema.className = 'gema-acerto acertou h-11 rounded-2xl flex items-center justify-center text-base font-black border-2 border-creme text-navy';
+            gema.innerHTML = '✓';
+            if (comSom) tocarPopGema(i - 1);
+          } else {
+            gema.className = 'gema-acerto errou h-11 rounded-2xl flex items-center justify-center text-base font-bold text-azul-borda/70';
+            gema.innerHTML = '✕';
+          }
+          gema.style.opacity = '1';
+          gema.style.transform = 'scale(1)';
+        }, 120 + (i * 90));
+      }
+
+      // Explosão de confetes e Fanfarra sonora
+      if (pts >= 3) {
+        dispararConfetesDuolingo(pts === 5 ? 'mega' : 'normal');
+      }
+      if (comSom) {
+        setTimeout(() => {
+          tocarFanfarraDuolingo(pts === 5);
+        }, 300);
+      }
+    }
+
+    function mudarEixo(idx) {
+      estadoAtual.eixoIdx = idx;
+      [0, 1, 2].forEach(i => {
+        document.getElementById('btn-eixo-' + i).classList.toggle('ativo', i === idx);
+      });
+      reiniciarComemoracao(true);
+    }
+
+    function mudarPontos(p) {
+      estadoAtual.pontos = p;
+      [5, 4, 3, 1].forEach(pt => {
+        document.getElementById('btn-pts-' + pt).classList.toggle('ativo', pt === p);
+      });
+      reiniciarComemoracao(true);
+    }
+
+    function reiniciarComemoracao(comSom = false) {
+      const card = document.getElementById('card-modulo');
+      card.style.transition = 'none';
+      card.style.transform = 'scale(0.95) translateY(10px)';
+      card.style.opacity = '0';
+
+      const disco = document.querySelector('.anim-emblema-bouncy');
+      if (disco) {
+        disco.classList.remove('anim-emblema-bouncy');
+        void disco.offsetWidth; // trigger reflow
+        disco.classList.add('anim-emblema-bouncy');
+      }
+
+      setTimeout(() => {
+        card.style.transition = 'all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        card.style.transform = 'scale(1) translateY(0)';
+        card.style.opacity = '1';
+        renderizarTela(comSom);
+      }, 60);
+    }
+
+    function cliqueContinuar() {
+      tocarNota(659.25, 0.15, 'sine');
+      setTimeout(() => {
+        tocarNota(880, 0.25, 'triangle');
+      }, 100);
+
+      // Avança para o próximo módulo no simulador
+      const proximo = (estadoAtual.eixoIdx + 1) % 3;
+      mudarEixo(proximo);
+    }
+
+    // Tecla Espaço para avançar rápido (padrão Duolingo)
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT') {
+        e.preventDefault();
+        cliqueContinuar();
+      }
+    });
+
+    // ==========================================
+    // SISTEMA AVANÇADO DE CONFETES DUOLINGO (CANVAS)
+    // Disparo em leques laterais + centro com rotação 3D
+    // ==========================================
+    const canvas = document.getElementById('canvas-confetes');
+    const ctx = canvas.getContext('2d');
+    let particulas = [];
+    let animId = null;
+
+    function redimensionarCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', redimensionarCanvas);
+    redimensionarCanvas();
+
+    function criarConfete(origemX, origemY, anguloBase, forca) {
+      const cores = [
+        '#FFD21F', // Amarelo MIVA
+        '#ACB824', // Verde MIVA
+        '#4E8AB2', // Azul MIVA
+        '#FFFFFF', // Branco destaque
+        '#FFAA00', // Laranja ouro
+        '#F9F1E5'  // Creme suave
+      ];
+      
+      const rad = anguloBase + (Math.random() - 0.5) * 0.95;
+      const vel = (forca * 0.7) + (Math.random() * forca * 0.9);
+      const tipoForma = Math.random() > 0.25 ? 'fitinha' : 'estrelinha';
+
+      return {
+        x: origemX,
+        y: origemY,
+        vx: Math.cos(rad) * vel,
+        vy: Math.sin(rad) * vel,
+        largura: tipoForma === 'fitinha' ? 7 + Math.random() * 8 : 10 + Math.random() * 6,
+        altura: tipoForma === 'fitinha' ? 12 + Math.random() * 14 : 10 + Math.random() * 6,
+        tipo: tipoForma,
+        cor: cores[Math.floor(Math.random() * cores.length)],
+        rotacaoX: Math.random() * 360,
+        rotacaoY: Math.random() * 360,
+        vRotX: (Math.random() - 0.5) * 14,
+        vRotY: (Math.random() - 0.5) * 16,
+        gravidade: 0.16 + Math.random() * 0.12,
+        resistencia: 0.982,
+        vida: 1,
+        decaimento: 0.007 + Math.random() * 0.006
+      };
+    }
+
+    function dispararConfetesDuolingo(intensidade = 'mega') {
+      particulas = [];
+      const total = intensidade === 'mega' ? 140 : 80;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      // 1. Canhão Esquerdo disparando para cima e direita
+      for (let i = 0; i < total * 0.4; i++) {
+        particulas.push(criarConfete(w * 0.15, h * 0.85, -Math.PI * 0.35, 16));
+      }
+
+      // 2. Canhão Direito disparando para cima e esquerda
+      for (let i = 0; i < total * 0.4; i++) {
+        particulas.push(criarConfete(w * 0.85, h * 0.85, -Math.PI * 0.65, 16));
+      }
+
+      // 3. Chuva central explosiva
+      for (let i = 0; i < total * 0.2; i++) {
+        particulas.push(criarConfete(w * 0.5, h * 0.38, -Math.PI * 0.5, 12));
+      }
+
+      if (animId) cancelAnimationFrame(animId);
+      loopConfetes();
+    }
+
+    function desenharEstrela(ctx, cx, cy, spikes, outerRadius, innerRadius) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius);
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y);
+        rot += step;
+      }
+      ctx.lineTo(cx, cy - outerRadius);
+      ctx.closePath();
+      ctx.fill();
+    }
+
+    function loopConfetes() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let ativas = false;
+
+      for (let i = 0; i < particulas.length; i++) {
+        const p = particulas[i];
+        if (p.vida > 0) {
+          ativas = true;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += p.gravidade;
+          p.vx *= p.resistencia;
+          p.rotacaoX += p.vRotX;
+          p.rotacaoY += p.vRotY;
+          p.vida -= p.decaimento;
+
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          // Efeito de cambalhota 3D simulando rotação Y e X
+          const escalaX = Math.cos((p.rotacaoX * Math.PI) / 180);
+          const escalaY = Math.sin((p.rotacaoY * Math.PI) / 180);
+          ctx.scale(escalaX, escalaY);
+
+          ctx.fillStyle = p.cor;
+          ctx.globalAlpha = Math.max(0, p.vida);
+
+          if (p.tipo === 'estrelinha') {
+            desenharEstrela(ctx, 0, 0, 5, p.largura * 0.8, p.largura * 0.4);
+          } else {
+            ctx.fillRect(-p.largura / 2, -p.altura / 2, p.largura, p.altura);
+          }
+
+          ctx.restore();
+        }
+      }
+
+      if (ativas) {
+        animId = requestAnimationFrame(loopConfetes);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    // Inicialização ao carregar a página
+    window.addEventListener('DOMContentLoaded', () => {
+      renderizarTela(false);
+      // Habilita áudio no primeiro clique do usuário em qualquer lugar
+      document.body.addEventListener('pointerdown', () => {
+        initAudio();
+      }, { once: true });
+    });
+  </script>
+</body></html>

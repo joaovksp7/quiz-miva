@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missão Clima - Transição e Identificação do Módulo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #183850;
+    --navy-fundo: #0E2438;
+    --navy-card: #132F45;
+    --creme: #F9F1E5;
+    --azul-borda: #87A3AE;
+    --azul-medio: #4E8AB2;
+    --azul-forte: #3A6F92;
+    --amarelo: #FFD21F;
+    --amarelo-sombra: #C9A200;
+    --amarelo-brilho: #FFE366;
+    --verde: #ACB824;
+    --verde-texto: #5E6A0F;
+    --vermelho: #A32318;
+    --raio: 18px;
+    --raio-card: 28px;
+    --toque: 52px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    background-color: var(--navy-fundo);
+    color: var(--creme);
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Container principal */
+  .container-geral {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 1.25rem;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 45%, #183e5c 0%, #0e2438 75%, #081624 100%);
+  }
+
+  /* Barra de testes no topo */
+  .topo-teste {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(14, 36, 56, 0.85);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(135, 163, 174, 0.3);
+    border-radius: 999px;
+    padding: 0.45rem 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    z-index: 50;
+    font-size: 0.85rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  }
+
+  .topo-teste__logo {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-weight: 800;
+    color: var(--amarelo);
+    letter-spacing: 0.04em;
+  }
+
+  .topo-teste__tabs {
+    display: flex;
+    gap: 0.35rem;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 3px;
+    border-radius: 999px;
+  }
+
+  .tab-btn {
+    border: none;
+    background: transparent;
+    color: var(--azul-borda);
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn:hover { color: var(--creme); }
+  .tab-btn.ativo {
+    background: var(--amarelo);
+    color: var(--navy);
+    box-shadow: 0 2px 6px rgba(255, 210, 31, 0.4);
+  }
+
+  .btn-replay {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--azul-borda);
+    color: var(--creme);
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s;
+  }
+
+  .btn-replay:hover {
+    background: var(--azul-forte);
+    color: #fff;
+    transform: rotate(-10deg) scale(1.04);
+  }
+
+  /* ==========================================================================
+     CANVAS DE PARTÍCULAS E RAIOS DE FUNDO
+     ========================================================================== */
+  .fundo-animado {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  #canvasParticulas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Sunburst rotativo suave */
+  .sunburst-raios {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 800px;
+    height: 800px;
+    transform: translate(-50%, -50%);
+    background: repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 210, 31, 0.04) 0deg 15deg,
+      transparent 15deg 30deg
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    animation: girarRaios 50s linear infinite;
+    mask-image: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 65%);
+    -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 65%);
+  }
+
+  @keyframes girarRaios {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  /* Ondas de choque / Radar de pulso */
+  .radar-pulsos {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+  }
+
+  .radar-pulso {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid var(--amarelo);
+    opacity: 0;
+    animation: radarOnda 4s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+  }
+  .radar-pulso:nth-child(2) { animation-delay: 1.3s; border-color: var(--azul-medio); }
+  .radar-pulso:nth-child(3) { animation-delay: 2.6s; border-color: var(--verde); }
+
+  @keyframes radarOnda {
+    0% { transform: scale(0.6); opacity: 0.8; }
+    50% { opacity: 0.3; }
+    100% { transform: scale(7); opacity: 0; }
+  }
+
+  /* ==========================================================================
+     PALCO CENTRAL DA TRANSIÇÃO
+     ========================================================================== */
+  .transicao-palco {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 680px;
+    width: 100%;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    margin: auto 0;
+  }
+
+  /* 1. Pill de Etapa "BLOCO X DE 3" */
+  .pill-etapa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(24, 56, 80, 0.7);
+    border: 2px solid var(--azul-medio);
+    border-radius: 999px;
+    padding: 0.4rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--azul-borda);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: surgirDescendo 0.5s 0.1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .pill-etapa strong {
+    color: var(--amarelo);
+    font-size: 0.95rem;
+  }
+
+  .pill-etapa__ponto {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--amarelo);
+    box-shadow: 0 0 10px var(--amarelo);
+    animation: piscarPonto 1.5s ease-in-out infinite;
+  }
+
+  @keyframes piscarPonto {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.4); opacity: 0.5; }
+  }
+
+  /* 2. Emblema 3D com Duolingo Pop */
+  .emblema-wrapper {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transform: scale(0.3) rotate(-15deg);
+    animation: emblemaImpacto 0.75s 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .emblema-sombra-chao {
+    position: absolute;
+    bottom: -15px;
+    width: 120px;
+    height: 22px;
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 50%;
+    filter: blur(8px);
+    animation: flutuarSombra 3s ease-in-out infinite;
+  }
+
+  .emblema-container {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 40px;
+    background: linear-gradient(145deg, #FFFFFF, #E6DEC9);
+    border: 5px solid #FFFFFF;
+    box-shadow:
+      0 12px 0 #C2B79E,
+      0 20px 30px rgba(0, 0, 0, 0.45),
+      inset 0 -6px 0 rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: flutuarEmblema 3s ease-in-out infinite;
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .emblema-container:hover {
+    transform: scale(1.08) rotate(3deg) !important;
+  }
+  .emblema-container:active {
+    transform: scale(0.96) translateY(6px) !important;
+    box-shadow: 0 6px 0 #C2B79E, 0 10px 20px rgba(0,0,0,0.4);
+  }
+
+  @keyframes flutuarEmblema {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes flutuarSombra {
+    0%, 100% { transform: scale(1); opacity: 0.45; }
+    50% { transform: scale(0.85); opacity: 0.25; }
+  }
+
+  .emblema-icone {
+    width: 90px;
+    height: 90px;
+    filter: drop-shadow(0 4px 6px rgba(24, 56, 80, 0.25));
+    transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.3);
+  }
+
+  /* Partículas estelares ao redor do emblema */
+  .estrela-faísca {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    color: var(--amarelo);
+    filter: drop-shadow(0 0 6px var(--amarelo-brilho));
+    animation: girarFaisca 4s ease-in-out infinite alternate;
+  }
+  .faisca-1 { top: -5px; right: 5px; animation-delay: 0.2s; }
+  .faisca-2 { bottom: 20px; left: -15px; animation-delay: 0.9s; }
+  .faisca-3 { top: 30px; left: -10px; width: 14px; height: 14px; animation-delay: 1.4s; }
+
+  @keyframes girarFaisca {
+    0% { transform: scale(0.7) rotate(0deg); opacity: 0.5; }
+    100% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+  }
+
+  /* Selinho de nível / badge no canto do emblema */
+  .badge-numero {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    background: var(--amarelo);
+    color: var(--navy);
+    font-size: 0.95rem;
+    font-weight: 900;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 4px solid var(--navy-fundo);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 0 var(--amarelo-sombra), 0 8px 15px rgba(0,0,0,0.3);
+    animation: popSurgir 0.5s 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  }
+
+  /* 3. Título do Eixo de Alto Impacto */
+  .titulo-eixo-box {
+    margin-bottom: 0.75rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: surgirSubindo 0.6s 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .titulo-eixo {
+    margin: 0;
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    color: var(--amarelo);
+    text-shadow:
+      0 4px 0 #B89200,
+      0 8px 25px rgba(255, 210, 31, 0.35);
+    display: inline-block;
+    position: relative;
+  }
+
+  /* Efeito de brilho sweep no título */
+  .titulo-eixo::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transform: skewX(-25deg);
+    animation: brilhoTitulo 5s 1.5s infinite;
+  }
+
+  @keyframes brilhoTitulo {
+    0% { left: -100%; }
+    30%, 100% { left: 160%; }
+  }
+
+  /* 4. Frase de Instrução / Subtítulo */
+  .frase-missao {
+    margin: 0 auto 1.5rem auto;
+    font-size: clamp(1.05rem, 2.4vw, 1.35rem);
+    color: var(--creme);
+    max-width: 32rem;
+    line-height: 1.45;
+    font-weight: 400;
+    opacity: 0;
+    transform: translateY(15px);
+    animation: surgirSubindo 0.6s 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .frase-missao strong {
+    color: var(--amarelo);
+    font-weight: 700;
+  }
+
+  /* 5. Painel Gamificado de Informações da Rodada (Perguntas, Pontos, Regras) */
+  .card-metas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    background: rgba(19, 47, 69, 0.85);
+    backdrop-filter: blur(12px);
+    border: 2px solid var(--azul-forte);
+    border-radius: var(--raio);
+    padding: 0.85rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transform: translateY(15px);
+    animation: surgirSubindo 0.6s 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: left;
+  }
+
+  .meta-item__icone {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  .meta-item__icone--questoes {
+    background: rgba(172, 184, 36, 0.25);
+    color: var(--verde);
+    border: 1px solid var(--verde);
+  }
+
+  .meta-item__icone--sabedoria {
+    background: rgba(255, 210, 31, 0.2);
+    color: var(--amarelo);
+    border: 1px solid var(--amarelo);
+  }
+
+  .meta-item__info h4 {
+    margin: 0;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--azul-borda);
+    font-weight: 700;
+  }
+
+  .meta-item__info p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--creme);
+  }
+
+  .divisor-meta {
+    width: 1px;
+    height: 32px;
+    background: rgba(135, 163, 174, 0.25);
+  }
+
+  /* 6. Botão Duolingo 3D "Pushable" de Começar */
+  .btn-acao-box {
+    opacity: 0;
+    transform: scale(0.85);
+    animation: popSurgir 0.6s 0.85s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  }
+
+  .botao-duolingo {
+    appearance: none;
+    outline: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .botao-duolingo__sombra {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+    transform: translateY(6px);
+    transition: transform 0.15s ease;
+  }
+
+  .botao-duolingo__borda {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 999px;
+    background: var(--amarelo-sombra);
+    transform: translateY(4px);
+    transition: transform 0.15s ease;
+  }
+
+  .botao-duolingo__frente {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.15rem 3.2rem;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #FFE042 0%, var(--amarelo) 100%);
+    color: var(--navy);
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transform: translateY(0);
+    transition: transform 0.12s ease, filter 0.15s ease;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 2px 2px rgba(255, 255, 255, 0.6);
+  }
+
+  .botao-duolingo:hover .botao-duolingo__frente {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+  }
+  .botao-duolingo:hover .botao-duolingo__borda {
+    transform: translateY(6px);
+  }
+  .botao-duolingo:active .botao-duolingo__frente {
+    transform: translateY(4px);
+    filter: brightness(0.95);
+  }
+  .botao-duolingo:active .botao-duolingo__borda {
+    transform: translateY(4px);
+  }
+
+  .icone-seta {
+    transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .botao-duolingo:hover .icone-seta {
+    transform: translateX(5px);
+  }
+
+  /* Atalho de teclado */
+  .dica-teclado {
+    margin-top: 0.85rem;
+    font-size: 0.8rem;
+    color: var(--azul-borda);
+    opacity: 0;
+    animation: surgirSubindo 0.5s 1s forwards;
+  }
+
+  .dica-teclado kbd {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 5px;
+    padding: 0.15rem 0.45rem;
+    color: var(--creme);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  /* Rodapé sutil */
+  .rodape-transicao {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    color: var(--azul-borda);
+    z-index: 20;
+    border-top: 1px solid rgba(135, 163, 174, 0.15);
+  }
+
+  .rodape__marca {
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--amarelo);
+  }
+
+  /* ==========================================================================
+     ANIMAÇÕES KEYFRAMES
+     ========================================================================== */
+  @keyframes surgirDescendo {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes surgirSubindo {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes popSurgir {
+    0% { opacity: 0; transform: scale(0.4); }
+    70% { opacity: 1; transform: scale(1.15); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes emblemaImpacto {
+    0% {
+      opacity: 0;
+      transform: scale(0.2) translateY(-60px) rotate(-20deg);
+    }
+    60% {
+      opacity: 1;
+      transform: scale(1.15) translateY(10px) rotate(5deg);
+    }
+    80% {
+      transform: scale(0.95) translateY(-5px) rotate(-2deg);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0) rotate(0deg);
+    }
+  }
+
+  /* Movimento reduzido */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .sunburst-raios, .radar-pulsos { display: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container-geral">
+
+  <!-- Barra Interativa Superior para teste rápido dos 3 eixos -->
+  <header class="topo-teste">
+    <div class="topo-teste__logo">
+      <span>🎮</span>
+      <span>SIMULADOR MIVA</span>
+    </div>
+
+    <div class="topo-teste__tabs">
+      <button type="button" class="tab-btn ativo" data-modulo="0">Bloco 1: Alertas!</button>
+      <button type="button" class="tab-btn" data-modulo="1">Bloco 2: Preparação</button>
+      <button type="button" class="tab-btn" data-modulo="2">Bloco 3: Durante</button>
+    </div>
+
+    <button type="button" class="btn-replay" id="btnReplay">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+        <path d="M3 3v5h5"/>
+      </svg>
+      Repetir Entrada!
+    </button>
+  </header>
+
+  <!-- Camada de Fundo Dinâmica: Raios e Ondas de Choque -->
+  <div class="fundo-animado">
+    <div class="sunburst-raios"></div>
+    <div class="radar-pulsos">
+      <div class="radar-pulso"></div>
+      <div class="radar-pulso"></div>
+      <div class="radar-pulso"></div>
+    </div>
+    <canvas id="canvasParticulas"></canvas>
+  </div>
+
+  <!-- Palco Central com os Elementos Animados -->
+  <main class="transicao-palco" id="palcoTransicao">
+
+    <!-- 1. Pill de etapa -->
+    <div class="pill-etapa">
+      <span class="pill-etapa__ponto"></span>
+      <span>ETAPA <strong id="etapaNumero">1 DE 3</strong></span>
+    </div>
+
+    <!-- 2. Emblema Temático do Eixo -->
+    <div class="emblema-wrapper">
+      <div class="emblema-sombra-chao"></div>
+
+      <!-- Faíscas douradas -->
+      <svg class="estrela-faísca faisca-1" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+      </svg>
+      <svg class="estrela-faísca faisca-2" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+      </svg>
+      <svg class="estrela-faísca faisca-3" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 0L14.5 9.5L24 12L14.5 14.5L12 24L9.5 14.5L0 12L9.5 9.5L12 0Z"/>
+      </svg>
+
+      <!-- Cartucho / Medalha 3D -->
+      <div class="emblema-container" id="emblemaBox" title="Clique para sentir o impacto elástico!">
+        <div id="iconeSlot">
+          <!-- Ícone SVG injetado via JS (Sino/Radar para Alertas) -->
+        </div>
+      </div>
+
+      <!-- Badge de Bloco -->
+      <div class="badge-numero" id="badgeNumero">1</div>
+    </div>
+
+    <!-- 3. Título Principal em Grande Destaque -->
+    <div class="titulo-eixo-box">
+      <h1 class="titulo-eixo" id="tituloEixo">Alertas!</h1>
+    </div>
+
+    <!-- 4. Frase Pedagógica Inspiradora -->
+    <p class="frase-missao" id="fraseEixo">
+      Reconhecer os sinais da natureza e saber exatamente de onde vem o aviso oficial.
+    </p>
+
+    <!-- 5. Metas da Rodada (Gamificação Duolingo) -->
+    <div class="card-metas">
+      <div class="meta-item">
+        <div class="meta-item__icone meta-item__icone--questoes">
+          5Q
+        </div>
+        <div class="meta-item__info">
+          <h4>Desafio</h4>
+          <p>5 Perguntas</p>
+        </div>
+      </div>
+
+      <div class="divisor-meta"></div>
+
+      <div class="meta-item">
+        <div class="meta-item__icone meta-item__icone--sabedoria">
+          ⚡
+        </div>
+        <div class="meta-item__info">
+          <h4>Recompensa</h4>
+          <p>+50 Sabedoria</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. Botão de Ação Estilo Duolingo -->
+    <div class="btn-acao-box">
+      <button type="button" class="botao-duolingo" id="btnIniciar">
+        <span class="botao-duolingo__sombra"></span>
+        <span class="botao-duolingo__borda"></span>
+        <span class="botao-duolingo__frente">
+          <span>COMEÇAR O BLOCO</span>
+          <svg class="icone-seta" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </span>
+      </button>
+
+      <p class="dica-teclado">Pressione <kbd>Enter</kbd> ou <kbd>Espaço</kbd> para iniciar</p>
+    </div>
+
+  </main>
+
+  <!-- Rodapé Institucional do MIVA -->
+  <footer class="rodape-transicao">
+    <div class="rodape__marca">MISSÃO CLIMA • MIVA</div>
+    <div>Conhecimento que salva vidas!</div>
+  </footer>
+
+</div>
+
+<script>
+  /* ==========================================================================
+     DADOS DOS 3 EIXOS DO QUIZ MIVA
+     ========================================================================== */
+  const EIXOS_MIVA = [
+    {
+      modulo: 1,
+      titulo: 'Alertas!',
+      frase: 'Reconhecer os sinais da natureza e saber exatamente de onde vem o aviso oficial.',
+      corDestaque: '#FFD21F',
+      iconeSvg: `
+        <svg class="emblema-icone" viewBox="0 0 64 64" fill="none">
+          <path d="M32 8C23.16 8 16 15.16 16 24V38L10 46H54L48 38V24C48 15.16 40.84 8 32 8Z" fill="#183850"/>
+          <path d="M32 4C20.95 4 12 12.95 12 24V36L8 44C6.5 47 8.67 50 12 50H52C55.33 50 57.5 47 56 44L52 36V24C52 12.95 43.05 4 32 4ZM44 38L47 42H17L20 38V24C20 17.37 25.37 12 32 12C38.63 12 44 17.37 44 24V38Z" fill="#4E8AB2"/>
+          <path d="M26 52C26 55.31 28.69 58 32 58C35.31 58 38 55.31 38 52H26Z" fill="#FFD21F"/>
+          <circle cx="32" cy="24" r="5" fill="#FFD21F"/>
+          <path d="M20 12C16 16 14 20 14 26" stroke="#ACB824" stroke-width="3" stroke-linecap="round"/>
+          <path d="M44 12C48 16 50 20 50 26" stroke="#ACB824" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      `
+    },
+    {
+      modulo: 2,
+      titulo: 'Preparação',
+      frase: 'O que dá para organizar com a família antes de a água subir ou a tempestade chegar.',
+      corDestaque: '#ACB824',
+      iconeSvg: `
+        <svg class="emblema-icone" viewBox="0 0 64 64" fill="none">
+          <!-- Mochila de Emergência -->
+          <rect x="16" y="16" width="32" height="40" rx="12" fill="#183850"/>
+          <path d="M22 16V10C22 6.69 24.69 4 28 4H36C39.31 4 42 6.69 42 10V16" stroke="#4E8AB2" stroke-width="4" stroke-linecap="round"/>
+          <rect x="20" y="28" width="24" height="22" rx="6" fill="#4E8AB2"/>
+          <!-- Cruz de kit / primeiros socorros -->
+          <path d="M32 34V44M27 39H37" stroke="#FFD21F" stroke-width="4" stroke-linecap="round"/>
+          <!-- Bolsos laterais -->
+          <rect x="10" y="30" width="6" height="18" rx="3" fill="#ACB824"/>
+          <rect x="48" y="30" width="6" height="18" rx="3" fill="#ACB824"/>
+        </svg>
+      `
+    },
+    {
+      modulo: 3,
+      titulo: 'Durante',
+      frase: 'A hora de agir com máxima calma e segurança, sem se colocar nem colocar outros em risco.',
+      corDestaque: '#4E8AB2',
+      iconeSvg: `
+        <svg class="emblema-icone" viewBox="0 0 64 64" fill="none">
+          <!-- Escudo protetor -->
+          <path d="M32 6L12 14V30C12 43.6 20.6 54.2 32 58C43.4 54.2 52 43.6 52 30V14L32 6Z" fill="#183850"/>
+          <path d="M32 10L16 16.4V29.5C16 40.8 22.8 49.5 32 52.8C41.2 49.5 48 40.8 48 29.5V16.4L32 10Z" fill="#4E8AB2"/>
+          <!-- Raio de energia / segurança -->
+          <path d="M34 16L24 32H33L30 46L42 28H33L36 16H34Z" fill="#FFD21F"/>
+        </svg>
+      `
+    }
+  ];
+
+  let moduloAtual = 0;
+
+  // Elementos do DOM
+  const etapaNumeroEl = document.getElementById('etapaNumero');
+  const badgeNumeroEl = document.getElementById('badgeNumero');
+  const tituloEixoEl = document.getElementById('tituloEixo');
+  const fraseEixoEl = document.getElementById('fraseEixo');
+  const iconeSlotEl = document.getElementById('iconeSlot');
+  const palcoTransicaoEl = document.getElementById('palcoTransicao');
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const btnReplay = document.getElementById('btnReplay');
+  const btnIniciar = document.getElementById('btnIniciar');
+  const emblemaBox = document.getElementById('emblemaBox');
+
+  /* ==========================================================================
+     SINTETIZADOR DE ÁUDIO WEB AUDIO API (Gamificado Duolingo)
+     Sem nenhum asset sonoro externo — sintetizado direto no navegador!
+     ========================================================================== */
+  let audioCtx = null;
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) audioCtx = new AudioContextClass();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  // Som de Fanfarra curta ("Whoosh & Ding" de entrada de módulo)
+  function tocarSomEntrada() {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const agora = ctx.currentTime;
+
+      // Nota 1 (Dó)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(523.25, agora + 0.1); // C5
+      gain1.gain.setValueAtTime(0, agora);
+      gain1.gain.linearRampToValueAtTime(0.18, agora + 0.15);
+      gain1.gain.exponentialRampToValueAtTime(0.001, agora + 0.45);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(agora + 0.1);
+      osc1.stop(agora + 0.5);
+
+      // Nota 2 (Sol)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'triangle';
+      osc2.frequency.setValueAtTime(783.99, agora + 0.25); // G5
+      gain2.gain.setValueAtTime(0, agora + 0.2);
+      gain2.gain.linearRampToValueAtTime(0.2, agora + 0.28);
+      gain2.gain.exponentialRampToValueAtTime(0.001, agora + 0.6);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(agora + 0.25);
+      osc2.stop(agora + 0.65);
+
+      // Nota 3 (Dó Agudo Brilhante)
+      const osc3 = ctx.createOscillator();
+      const gain3 = ctx.createGain();
+      osc3.type = 'sine';
+      osc3.frequency.setValueAtTime(1046.50, agora + 0.38); // C6
+      gain3.gain.setValueAtTime(0, agora + 0.35);
+      gain3.gain.linearRampToValueAtTime(0.25, agora + 0.42);
+      gain3.gain.exponentialRampToValueAtTime(0.0001, agora + 0.95);
+      osc3.connect(gain3);
+      gain3.connect(ctx.destination);
+      osc3.start(agora + 0.38);
+      osc3.stop(agora + 1.0);
+    } catch(e) {}
+  }
+
+  // Som de Clique Tátil no Botão Começar
+  function tocarSomBotao() {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const agora = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, agora);
+      osc.frequency.exponentialRampToValueAtTime(880, agora + 0.12);
+      gain.gain.setValueAtTime(0.3, agora);
+      gain.gain.exponentialRampToValueAtTime(0.001, agora + 0.15);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(agora);
+      osc.stop(agora + 0.16);
+    } catch(e) {}
+  }
+
+  /* ==========================================================================
+     RENDERIZAÇÃO E DISPARO DA ANIMAÇÃO DO BLOCO
+     ========================================================================== */
+  function carregarModulo(indice) {
+    moduloAtual = indice;
+    const dados = EIXOS_MIVA[indice];
+
+    // Atualiza classes ativas nas abas
+    tabBtns.forEach((btn, i) => {
+      btn.classList.toggle('ativo', i === indice);
+    });
+
+    // Reinicia as animações CSS removendo e recolocando os filhos ou forçando reflow
+    palcoTransicaoEl.style.animation = 'none';
+    palcoTransicaoEl.offsetHeight; // forçar reflow
+    palcoTransicaoEl.style.animation = '';
+
+    // Atualiza Textos
+    etapaNumeroEl.textContent = `${dados.modulo} DE 3`;
+    badgeNumeroEl.textContent = dados.modulo;
+    tituloEixoEl.textContent = dados.titulo;
+    fraseEixoEl.textContent = dados.frase;
+    iconeSlotEl.innerHTML = dados.iconeSvg;
+
+    // Dispara som e partículas
+    tocarSomEntrada();
+    dispararParticulasConquista();
+
+    // Adiciona classe de animação temporária em todos os elementos filhos
+    const animados = palcoTransicaoEl.querySelectorAll('[style*="animation"], .pill-etapa, .emblema-wrapper, .titulo-eixo-box, .frase-missao, .card-metas, .btn-acao-box');
+    animados.forEach(el => {
+      const animOriginal = window.getComputedStyle(el).animation;
+      el.style.animation = 'none';
+      el.offsetHeight;
+      el.style.animation = '';
+    });
+  }
+
+  // Interação ao clicar no emblema: efeito tátil de squash & stretch
+  emblemaBox.addEventListener('click', () => {
+    emblemaBox.style.transform = 'scale(0.88) translateY(8px)';
+    tocarSomBotao();
+    setTimeout(() => {
+      emblemaBox.style.transform = 'scale(1.15) translateY(-6px)';
+      setTimeout(() => {
+        emblemaBox.style.transform = '';
+      }, 150);
+    }, 100);
+  });
+
+  // Troca de abas
+  tabBtns.forEach((btn, i) => {
+    btn.addEventListener('click', () => carregarModulo(i));
+  });
+
+  btnReplay.addEventListener('click', () => carregarModulo(moduloAtual));
+
+  btnIniciar.addEventListener('click', () => {
+    tocarSomBotao();
+    btnIniciar.style.transform = 'scale(0.96)';
+    setTimeout(() => {
+      btnIniciar.style.transform = '';
+      alert(`🚀 Iniciando o ${EIXOS_MIVA[moduloAtual].titulo}! No quiz real, este botão leva diretamente para a primeira pergunta do bloco.`);
+    }, 150);
+  });
+
+  // Atalho de teclado (Enter ou Espaço)
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      btnIniciar.click();
+    }
+  });
+
+  /* ==========================================================================
+     CANVAS DE PARTÍCULAS (Brilhos de Ambiente)
+     ========================================================================== */
+  const canvas = document.getElementById('canvasParticulas');
+  const ctx = canvas.getContext('2d');
+  let largura, altura;
+  const particulas = [];
+  const CORES = ['#FFD21F', '#ACB824', '#4E8AB2', '#F9F1E5', '#FFFFFF'];
+
+  function redimensionarCanvas() {
+    largura = canvas.width = window.innerWidth;
+    altura = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', redimensionarCanvas);
+  redimensionarCanvas();
+
+  class ParticulaAmbiente {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * largura;
+      this.y = altura + Math.random() * 50;
+      this.tamanho = 1.5 + Math.random() * 3.5;
+      this.cor = CORES[Math.floor(Math.random() * CORES.length)];
+      this.velocidadeY = 0.4 + Math.random() * 0.9;
+      this.velocidadeX = (Math.random() - 0.5) * 0.5;
+      this.alfa = 0.1 + Math.random() * 0.6;
+      this.pulso = Math.random() * Math.PI;
+    }
+    atualizar() {
+      this.y -= this.velocidadeY;
+      this.x += this.velocidadeX;
+      this.pulso += 0.03;
+      if (this.y < -10) this.reset();
+    }
+    desenhar() {
+      ctx.save();
+      const alfaAtual = this.alfa * (0.6 + 0.4 * Math.sin(this.pulso));
+      ctx.globalAlpha = Math.max(0, Math.min(1, alfaAtual));
+      ctx.fillStyle = this.cor;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.tamanho, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  // Pop de confetes ao entrar em um módulo
+  let confetes = [];
+  function dispararParticulasConquista() {
+    confetes = [];
+    const centroX = largura / 2;
+    const centroY = altura / 2 - 40;
+
+    for (let i = 0; i < 45; i++) {
+      const angulo = Math.random() * Math.PI * 2;
+      const velocidade = 3 + Math.random() * 7;
+      confetes.push({
+        x: centroX,
+        y: centroY,
+        vx: Math.cos(angulo) * velocidade,
+        vy: Math.sin(angulo) * velocidade - 2,
+        tamanho: 4 + Math.random() * 6,
+        cor: CORES[Math.floor(Math.random() * CORES.length)],
+        vida: 1,
+        decaimento: 0.015 + Math.random() * 0.02,
+        rotacao: Math.random() * 360,
+        vRot: (Math.random() - 0.5) * 15
+      });
+    }
+  }
+
+  // Inicializa 40 partículas flutuantes
+  for (let i = 0; i < 40; i++) {
+    const p = new ParticulaAmbiente();
+    p.y = Math.random() * altura;
+    particulas.push(p);
+  }
+
+  function loopAnimacao() {
+    ctx.clearRect(0, 0, largura, altura);
+
+    // Partículas de ambiente
+    particulas.forEach(p => {
+      p.atualizar();
+      p.desenhar();
+    });
+
+    // Confetes temporários da transição
+    for (let i = confetes.length - 1; i >= 0; i--) {
+      const c = confetes[i];
+      c.x += c.vx;
+      c.y += c.vy;
+      c.vy += 0.15; // gravidade
+      c.vx *= 0.98;
+      c.rotacao += c.vRot;
+      c.vida -= c.decaimento;
+
+      if (c.vida <= 0) {
+        confetes.splice(i, 1);
+        continue;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = c.vida;
+      ctx.translate(c.x, c.y);
+      ctx.rotate((c.rotacao * Math.PI) / 180);
+      ctx.fillStyle = c.cor;
+      ctx.fillRect(-c.tamanho / 2, -c.tamanho / 2, c.tamanho, c.tamanho * 0.6);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(loopAnimacao);
+  }
+  loopAnimacao();
+
+  // Inicia com o primeiro módulo
+  carregarModulo(0);
+</script>
+
+</body>
+</html>

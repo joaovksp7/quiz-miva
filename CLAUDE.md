@@ -40,7 +40,7 @@ Se qualquer parte da instrução estiver ambígua, perguntar antes de ler os arq
 
 ## Projeto — Missão Clima (quiz MIVA)
 
-Quiz educativo sobre **enchentes e deslizamentos**, para estudantes de ensino fundamental e médio, ligado à plataforma MIVA (Memorial das Inundações dos Vales). Publicado dentro de um site WordPress.
+Quiz educativo sobre **inundações e deslizamentos**, para estudantes de ensino fundamental e médio, ligado à plataforma MIVA (Memorial das Inundações dos Vales). Publicado dentro de um site WordPress.
 
 Roda em **celular do aluno e em projetor de sala de aula** — as duas telas são alvo primário, não uma adaptação da outra.
 
@@ -55,7 +55,7 @@ Mapa dos slides:
 
 | slides | conteúdo |
 |---|---|
-| 1 | capa "Missão Clima — Enchentes e deslizamentos" |
+| 1 | capa "Missão Clima — Inundações e deslizamentos" |
 | 2 | divisor **ALERTAS!** |
 | 3–13 | 11 perguntas do eixo `alerta` |
 | 14 | divisor **PREPARAÇÃO** |
@@ -169,7 +169,7 @@ Layout da tela de pergunta, seguindo o slide 3:
 
 ```
 ┌──────────────────────────────────────────────┐
-│  arte de fundo: enchente à esquerda,         │
+│  arte de fundo: inundação à esquerda,        │
 │  deslizamento à direita                      │
 │   ┌────────────────────────────────────┐     │
 │   │  card creme, cantos bem arredondados│    │
