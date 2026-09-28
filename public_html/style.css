@@ -156,6 +156,10 @@ img { max-width: 100%; height: auto; display: block; }
   padding: 0;
 }
 
+/* O <picture> só escolhe o arquivo. Sem isto ele vira o item flex e os
+   100% da .capa passam a ser medidos contra ele, não contra a tela. */
+#tela-abertura picture { display: contents; }
+
 /* O max() é um piso: num celular deitado a janela é tão baixa que o desconto
    dos 15rem sozinho reduzia a capa a uns 20px de altura. Abaixo desse piso é
    melhor deixar a abertura rolar — no celular rolar é gesto natural. */
@@ -188,6 +192,44 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .abertura__resumo strong { color: var(--verde); }
+
+/* Celular em pé: o <picture> troca para a arte vertical (768x1376), que vira
+   fundo de tela cheia, e o resumo com o botão flutua por cima, como no
+   desktop. O media tem que bater com o do <source> no index.html — deitado,
+   a arte vertical perderia mais da metade, então fica a horizontal lá de cima.
+   O corte do cover sai das laterais; ancorado no topo, o título nunca some. */
+@media (max-width: 899px) and (orientation: portrait) {
+  #tela-abertura {
+    position: relative;
+    min-height: 100vh;                  /* sem dvh, ainda cabe */
+    min-height: 100dvh;
+  }
+
+  .capa {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  /* margin-top: auto encosta a faixa embaixo; position: relative a põe por
+     cima da capa. O degradê é o mesmo do desktop. */
+  .abertura__acao {
+    position: relative;
+    margin-top: auto;
+    padding: 3rem 1.25rem 1.75rem;
+    background: linear-gradient(to top,
+                rgba(14, 36, 56, 0.97) 0%,
+                rgba(14, 36, 56, 0.93) 45%,
+                rgba(14, 36, 56, 0.66) 78%,
+                rgba(14, 36, 56, 0) 100%);
+  }
+}
 
 /* --- 2. transição de módulo -------------------------------------------- */
 /* Mora no fim do arquivo, junto das outras telas animadas: precisa vir depois
@@ -799,6 +841,59 @@ img { max-width: 100%; height: auto; display: block; }
 .tela--final[data-nivel="1"] .placar,
 .tela--final[data-nivel="0"] .placar { color: var(--creme); text-shadow: none; }
 
+/* --- avaliação ----------------------------------------------------------- */
+/* O link para o formulário é a ação principal da tela; o "Jogar de novo"
+   passa a ser o discreto, logo abaixo. Chega depois do placar e aí fica
+   chamando: um halo que se expande e um reflexo que atravessa o botão. O
+   reflexo é degradê no próprio fundo, não pseudo-elemento, para dispensar
+   overflow: hidden — que cortaria o halo. */
+
+@keyframes avaliar-halo {
+  0%   { opacity: 0.7; box-shadow: 0 0 0 0 var(--amarelo); }
+  100% { opacity: 0;   box-shadow: 0 0 0 16px var(--amarelo); }
+}
+
+/* Em 0% o reflexo está fora do botão pela esquerda, em 100% pela direita:
+   atravessa no primeiro terço e o resto do ciclo é pausa. */
+@keyframes avaliar-reflexo {
+  0%        { background-position: 100% 0; }
+  35%, 100% { background-position: 0 0; }
+}
+
+.botao--avaliar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95em 2.2em;
+  font-size: clamp(1rem, 3.4vw, 1.15rem);
+  text-align: center;
+  text-decoration: none;
+  background:
+    linear-gradient(110deg, transparent 42%, rgba(255, 255, 255, 0.6) 50%, transparent 58%)
+      0 0 / 250% 100% no-repeat,
+    var(--amarelo);
+}
+
+.final__conteudo > .botao--avaliar {
+  animation:
+    surgir 520ms cubic-bezier(0.2, 0.7, 0.3, 1) 1.15s both,
+    avaliar-reflexo 3.2s ease-in-out 1.9s infinite;
+}
+
+.botao--avaliar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: avaliar-halo 1.8s ease-out 1.7s infinite;
+}
+
+.final__conteudo > .botao--discreto { animation-delay: 1.3s; }
+
 /* --- desktop e projetor -------------------------------------------------- */
 
 @media (min-width: 900px) {
@@ -820,6 +915,8 @@ img { max-width: 100%; height: auto; display: block; }
     transform: none !important;
     filter: none !important;
   }
+
+  .botao--avaliar::after { display: none; }
 }
 
 /* ==========================================================================

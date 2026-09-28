@@ -66,7 +66,7 @@
    'final-acertos', 'final-frase', 'final-estrelas', 'retomada', 'prisma',
    'aviso-carregando', 'anuncio',
    'btn-comecar', 'btn-iniciar-modulo', 'btn-avancar', 'btn-seguir',
-   'btn-seguir-texto', 'btn-jogar-de-novo'].forEach(function (id) {
+   'btn-seguir-texto', 'btn-avaliar', 'btn-jogar-de-novo'].forEach(function (id) {
     el[id] = document.getElementById(id);
   });
 
@@ -477,7 +477,7 @@
     mostrarTela('tela-final');
     montarFundo(el.prisma);
     contarPlacar(el['final-acertos'], total, 1200);
-    el['btn-jogar-de-novo'].focus();
+    el['btn-avaliar'].focus();
     anunciar('Resultado final: ' + total + ' de ' + (POR_MODULO * EIXOS.length) + '.');
   }
 

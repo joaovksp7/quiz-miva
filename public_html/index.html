@@ -20,13 +20,19 @@
     <h1 id="titulo-abertura" class="oculto-visual">
       Missão Clima — Inundações e deslizamentos
     </h1>
-    <img class="capa" src="assets/capa.webp" width="1402" height="846"
-         alt="Missão Clima, inundações e deslizamentos. De um lado, uma rua alagada
-              sob chuva forte, com um carro submerso e a placa “Chuva forte pode
-              causar inundações!”; do outro, uma encosta desabando sobre casas, com a
-              placa “Atenção! Risco de deslizamento”. No centro, dois estudantes
-              observam a cena. O clima muda. Os riscos aumentam. O conhecimento te
-              prepara!">
+    <!-- Celular em pé usa a arte vertical, de tela cheia; o resto, a horizontal.
+         O media é o mesmo da media query da abertura no style.css. -->
+    <picture>
+      <source media="(max-width: 899px) and (orientation: portrait)"
+              srcset="assets/capa-mobile.webp" width="768" height="1376">
+      <img class="capa" src="assets/capa.webp" width="1402" height="846"
+           alt="Missão Clima, inundações e deslizamentos. De um lado, uma rua alagada
+                sob chuva forte, com um carro submerso e a placa “Chuva forte pode
+                causar inundações!”; do outro, uma encosta desabando sobre casas, com a
+                placa “Atenção! Risco de deslizamento”. No centro, dois estudantes
+                observam a cena. O clima muda. Os riscos aumentam. O conhecimento te
+                prepara!">
+    </picture>
     <div class="abertura__acao">
       <p class="abertura__resumo">
         São <strong>15 perguntas</strong>, em 3 blocos de 5: alertas, preparação
@@ -247,7 +253,15 @@
       </p>
       <p class="resultado__frase" id="final-frase"></p>
       <ul class="retomada" id="retomada"></ul>
-      <button type="button" id="btn-jogar-de-novo" class="botao">
+      <!-- Link, não botão: leva para outra página. Nova aba porque o quiz vive
+           num iframe do WordPress, e o Google Forms não abre dentro dele. -->
+      <a id="btn-avaliar" class="botao botao--avaliar"
+         href="https://forms.gle/SJxUsXMgPKX3Tip86" target="_blank" rel="noopener">
+        <span>Avalie o Missão Clima</span>
+        <span class="botao__seta" aria-hidden="true">➔</span>
+        <span class="oculto-visual">(abre em nova aba)</span>
+      </a>
+      <button type="button" id="btn-jogar-de-novo" class="botao botao--discreto">
         Jogar de novo com perguntas novas
       </button>
     </div>
