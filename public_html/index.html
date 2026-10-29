@@ -256,11 +256,19 @@
       <!-- Link, não botão: leva para outra página. Nova aba porque o quiz vive
            num iframe do WordPress, e o Google Forms não abre dentro dele. -->
       <a id="btn-avaliar" class="botao botao--avaliar"
-         href="https://forms.gle/SJxUsXMgPKX3Tip86" target="_blank" rel="noopener">
+         href="https://docs.google.com/forms/d/e/1FAIpQLSc9KF0RoU1yJN_9U0o49DKQY52hDzEuQrsf0opaSfRyvFcHmg/viewform?usp=dialog"
+         target="_blank" rel="noopener">
         <span>Avalie o Missão Clima</span>
         <span class="botao__seta" aria-hidden="true">➔</span>
         <span class="oculto-visual">(abre em nova aba)</span>
       </a>
+      <!-- Mesmo formulário do botão acima, para quem joga no projetor abrir
+           no próprio celular. -->
+      <figure class="qr-avaliar">
+        <img src="assets/qr-formulario.webp" width="490" height="490"
+             alt="QR code do formulário de avaliação do Missão Clima">
+        <figcaption>Ou aponte a câmera do celular para o QR code</figcaption>
+      </figure>
       <button type="button" id="btn-jogar-de-novo" class="botao botao--discreto">
         Jogar de novo com perguntas novas
       </button>

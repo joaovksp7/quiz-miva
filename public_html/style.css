@@ -894,11 +894,38 @@ img { max-width: 100%; height: auto; display: block; }
 
 .final__conteudo > .botao--discreto { animation-delay: 1.3s; }
 
+/* QR do mesmo formulário. Câmera precisa de fundo claro e margem em volta
+   dos módulos, então vem na pastilha creme, como o selo. */
+.qr-avaliar {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.final__conteudo > .qr-avaliar { animation-delay: 1.25s; }
+
+.qr-avaliar img {
+  width: 140px;
+  height: auto;
+  padding: 0.5rem;
+  background: var(--creme);
+  border-radius: var(--raio);
+}
+
+.qr-avaliar figcaption {
+  color: var(--creme);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 /* --- desktop e projetor -------------------------------------------------- */
 
 @media (min-width: 900px) {
   .final__conteudo { max-width: 40rem; gap: 1.3rem; }
   .final__selo { width: 156px; }
+  .qr-avaliar img { width: 200px; }
 }
 
 /* --- movimento reduzido -------------------------------------------------- */
