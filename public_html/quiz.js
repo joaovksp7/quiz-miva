@@ -254,6 +254,7 @@
       botao.type = 'button';
       botao.className = 'alternativa';
       botao.setAttribute('data-certa', original === pergunta.correta ? '1' : '0');
+      botao.setAttribute('data-indice', String(original));
 
       var letra = document.createElement('span');
       letra.className = 'alternativa__letra';
@@ -306,10 +307,14 @@
     el.veredito.className = 'veredito ' + (certo ? 'veredito--certa' : 'veredito--errada');
     el.veredito.hidden = false;
 
-    /* Explicação ainda não gerada para todas as perguntas: quando o campo
-       está vazio, a área simplesmente não aparece. */
-    if (pergunta.explicacao) {
-      el.explicacao.textContent = pergunta.explicacao;
+    /* Cada alternativa tem a sua explicação (explicacoes[i] é a de
+       alternativas[i]); mostra a da que foi clicada. Nem toda alternativa tem
+       explicação na planilha: quando falta, a área simplesmente não aparece. */
+    var explicacao = (pergunta.explicacoes || [])[
+      Number(escolhido.getAttribute('data-indice'))
+    ] || '';
+    if (explicacao) {
+      el.explicacao.textContent = explicacao;
       el.explicacao.hidden = false;
     }
 
@@ -320,7 +325,7 @@
 
     anunciar(
       (certo ? 'Resposta certa. ' : 'Resposta errada. ') +
-      (pergunta.explicacao || '')
+      explicacao
     );
   }
 

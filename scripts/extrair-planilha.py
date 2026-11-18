@@ -12,10 +12,15 @@ o quiz.js lê o perguntas.json comitado, nunca a planilha.
 Substitui o scripts/extrair.py, que lia o fonte/Pergunta aqui.pptx. A planilha
 é a fonte da verdade do conteúdo; o .pptx fica só como referência visual.
 
-A resposta correta é a coluna marcada "RESPOSTA CORRETA" no cabeçalho de cada
-bloco. Cada bloco traz o próprio cabeçalho, e é dele que saem as colunas — por
-isso o bloco de verdadeiro/falso, que usa outras colunas, entra sem exceção
-escrita no código.
+O cabeçalho de cada bloco numera as colunas duas vezes: "1 2 3 4" para as
+alternativas e, de novo, "1 2 3 4" para a explicação de cada uma. A alternativa
+1 é sempre a correta; a explicação 1 é a dela, a 2 é a da alternativa 2, e
+assim por diante. Cada bloco traz o próprio cabeçalho, e é dele que saem as
+colunas — por isso o bloco de verdadeiro/falso, que usa outras colunas, entra
+sem exceção escrita no código.
+
+As explicações também vêm da planilha: o perguntas.json é gerado por inteiro,
+e corrigir uma explicação é corrigir a planilha e rodar de novo.
 """
 
 import argparse
@@ -33,9 +38,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import empacotar  # noqa: E402  (precisa do sys.path acima)
 
 RAIZ = Path(__file__).resolve().parent.parent
-SAIDA = RAIZ / "perguntas.json"
+SAIDA = RAIZ / "public_html" / "perguntas.json"
 
-PLANILHA = "1WtAnqDDJR0ufUbI4LbHF3VuW5tW_x8WN1ltbRSfJ8AI"
+PLANILHA = "1rK3ugwFSLeA2OH48b-480AZXTEjKZntV"
 URL = "https://docs.google.com/spreadsheets/d/{}/export?format=csv".format(PLANILHA)
 
 # Semente fixa: rodar duas vezes tem que dar o mesmo JSON, senão todo diff do
@@ -56,6 +61,19 @@ EIXOS = ["alerta", "preparacao", "durante"]
 # uma partida sem 5 por eixo.
 ESPERADO = {"alerta": 11, "preparacao": 16, "durante": 18}
 POR_MODULO = 5
+
+# Linhas da planilha que não entram no quiz, pelo ID, sempre com o motivo.
+# Pergunta repetida é bloqueio na validação: a escolha de qual versão fica é
+# humana e mora aqui, não num palpite do script. Apagar a linha na planilha
+# resolve também — aí a entrada vira aviso e pode sair daqui.
+IGNORAR = {
+    42: "repetida (=48); ficou a versão de Victória, que explica a certa",
+    43: "repetida (=49); ficou a versão de Victória, que explica a certa",
+    44: "repetida (=50); ficou a versão de Victória, que explica a certa",
+    45: "repetida (=51); ficou a versão de Victória, que explica a certa",
+    46: "cópia idêntica da 40",
+    47: "cópia idêntica da 41",
+}
 
 
 # ---------------------------------------------------------------- utilidades
@@ -122,18 +140,24 @@ def ler_cabecalho(linha):
     Do cabeçalho do bloco tira quais colunas são o quê. Cada bloco tem o seu,
     e é assim que o bloco de verdadeiro/falso — que usa as colunas E e F em vez
     de C, D, E, F — é lido sem nenhum caso especial no código.
+
+    A primeira vez que um número aparece, a coluna é a alternativa; a segunda,
+    é a explicação dela.
     """
-    mapa = {"id": None, "pergunta": None, "correta": [], "erradas": []}
+    mapa = {"id": None, "pergunta": None, "alternativas": {}, "explicacoes": {}}
     for i, celula in enumerate(linha):
         rotulo = sem_acento(celula.strip())
+        numero = re.fullmatch(r"(\d+)(?:\.0)?", rotulo)
         if rotulo == "ID":
             mapa["id"] = i
         elif rotulo == "PERGUNTA":
             mapa["pergunta"] = i
-        elif rotulo == "RESPOSTA CORRETA":
-            mapa["correta"].append(i)
-        elif rotulo == "RESPOSTA ERRADA":
-            mapa["erradas"].append(i)
+        elif numero:
+            n = int(numero.group(1))
+            if n not in mapa["alternativas"]:
+                mapa["alternativas"][n] = i
+            elif n not in mapa["explicacoes"]:
+                mapa["explicacoes"][n] = i
     return mapa
 
 
@@ -189,10 +213,9 @@ def ler(texto, relatorio):
             if cab["pergunta"] is None:
                 relatorio.bloqueio(numero, "cabeçalho sem a coluna PERGUNTA")
                 cab = None
-            elif len(cab["correta"]) != 1:
-                relatorio.bloqueio(numero, "cabeçalho com {} colunas RESPOSTA "
-                                           "CORRETA, esperado exatamente 1"
-                                           .format(len(cab["correta"])))
+            elif 1 not in cab["alternativas"]:
+                relatorio.bloqueio(numero, "cabeçalho sem a coluna 1 (resposta "
+                                           "correta)")
                 cab = None
             continue
 
@@ -207,23 +230,38 @@ def ler(texto, relatorio):
         def celula(i):
             return linha[i] if i is not None and i < len(linha) else ""
 
-        bruto_enunciado = celula(cab["pergunta"])
-        bruto_certa = celula(cab["correta"][0])
-        brutas_erradas = [celula(i) for i in cab["erradas"]]
+        ident = celula(cab["id"]).strip()
+        if not ident.isdigit():
+            relatorio.bloqueio(numero, "ID ausente ou não numérico: {!r}".format(ident))
+            continue
+        if int(ident) in IGNORAR:
+            relatorio.ignorados.add(int(ident))
+            relatorio.nota(numero, "ID {} ignorado: {}"
+                                   .format(ident, IGNORAR[int(ident)]))
+            continue
 
-        for rotulo, valor in [("enunciado", bruto_enunciado),
-                              ("resposta correta", bruto_certa)]:
-            if "\n" in valor or "\r" in valor:
-                relatorio.aviso(numero, "quebra de linha dentro d{} — juntada"
-                                        .format("o " + rotulo if rotulo ==
-                                                "enunciado" else "a " + rotulo))
-        for valor in brutas_erradas:
-            if "\n" in valor or "\r" in valor:
-                relatorio.aviso(numero, "quebra de linha dentro de uma "
-                                        "alternativa errada — juntada")
-        for valor in [bruto_enunciado, bruto_certa] + brutas_erradas:
+        bruto_enunciado = celula(cab["pergunta"])
+        # Ordem numérica: a 1 (correta) vem primeiro, e cada alternativa leva
+        # junto a explicação de mesmo número.
+        pares = [(celula(cab["alternativas"][n]),
+                  celula(cab["explicacoes"].get(n)))
+                 for n in sorted(cab["alternativas"])]
+
+        brutos = [bruto_enunciado] + [v for par in pares for v in par]
+        for valor in brutos:
+            # Quebra colada nas duas pontas ("evacua\nção") é a que pode ter
+            # partido palavra; com espaço ao lado é só a célula quebrando linha.
+            # Depois de pontuação é fim de frase, não palavra partida.
+            for antes, depois in re.findall(r"(\S*[^\s.,;:!?])[\r\n]+(\S+)",
+                                            valor):
+                relatorio.aviso(numero, "quebra de linha em {!r} — juntada "
+                                        "com espaço; confira se não partiu "
+                                        "palavra".format(antes + "⏎" + depois))
             if "*" in valor:
                 relatorio.aviso(numero, "asterisco removido de {!r}"
+                                        .format(valor.strip()[:40]))
+            if "\\" in valor:
+                relatorio.aviso(numero, "barra invertida em {!r}"
                                         .format(valor.strip()[:40]))
             if re.search(r"\.{2,}$", valor.strip()):
                 relatorio.aviso(numero, "ponto duplicado no fim de {!r}"
@@ -233,13 +271,8 @@ def ler(texto, relatorio):
                                         .format(valor.strip()[:40]))
 
         enunciado = limpar(bruto_enunciado)
-        certa = limpar(bruto_certa)
-        erradas = [limpar(v) for v in brutas_erradas if limpar(v)]
+        certa, explicacao_certa = limpar(pares[0][0]), limpar(pares[0][1])
 
-        ident = celula(cab["id"]).strip()
-        if not ident.isdigit():
-            relatorio.bloqueio(numero, "ID ausente ou não numérico: {!r}".format(ident))
-            continue
         if not enunciado:
             relatorio.bloqueio(numero, "enunciado vazio")
             continue
@@ -247,7 +280,28 @@ def ler(texto, relatorio):
             relatorio.bloqueio(numero, "resposta correta vazia")
             continue
 
-        alternativas = [certa] + erradas
+        alternativas = [certa]
+        explicacoes = [explicacao_certa]
+        for bruto_alt, bruto_exp in pares[1:]:
+            alt, exp = limpar(bruto_alt), limpar(bruto_exp)
+            if alt:
+                alternativas.append(alt)
+                explicacoes.append(exp)
+            elif exp:
+                relatorio.aviso(numero, "explicação sem alternativa ao lado — "
+                                        "descartada: {!r}".format(exp[:40]))
+
+        if not explicacao_certa:
+            relatorio.aviso(numero, "sem explicação para a resposta correta")
+        vazias = sum(1 for e in explicacoes[1:] if not e)
+        if vazias:
+            relatorio.aviso(numero, "{} alternativa(s) errada(s) sem explicação"
+                                    .format(vazias))
+        cheias = [e for e in explicacoes if e]
+        if len(set(cheias)) < len(cheias):
+            relatorio.aviso(numero, "duas alternativas com a mesma explicação "
+                                    "— confira se não foi cópia por engano")
+
         if len(alternativas) < 2:
             relatorio.bloqueio(numero, "menos de duas alternativas")
             continue
@@ -273,7 +327,7 @@ def ler(texto, relatorio):
             "pergunta": enunciado,
             "alternativas": alternativas,   # a certa ainda em [0]; embaralha depois
             "correta": 0,
-            "explicacao": "",
+            "explicacoes": explicacoes,     # uma por alternativa, mesma ordem
         })
 
     return perguntas
@@ -287,6 +341,7 @@ class Relatorio:
         self.bloqueios = []
         self.avisos = []
         self.notas = []
+        self.ignorados = set()
 
     def bloqueio(self, linha, texto):
         self.bloqueios.append((linha, texto))
@@ -336,6 +391,21 @@ def validar(perguntas, relatorio):
                 "explicações e precisa ser único".format(
                     ident, grupo[0]["linha"]))
 
+    por_texto = {}
+    for p in perguntas:
+        por_texto.setdefault(sem_acento(p["pergunta"]), []).append(p)
+    for grupo in por_texto.values():
+        if len(grupo) > 1:
+            relatorio.bloqueio(
+                grupo[-1]["linha"],
+                "pergunta repetida: IDs {} — escolha uma versão e ponha as "
+                "outras em IGNORAR".format(
+                    ", ".join(str(p["id"]) for p in grupo)))
+
+    for ident in sorted(set(IGNORAR) - relatorio.ignorados):
+        relatorio.aviso(0, "IGNORAR cita o ID {}, que não está mais na "
+                           "planilha — a entrada pode sair".format(ident))
+
     for eixo in EIXOS:
         n = sum(1 for p in perguntas if p["eixo"] == eixo)
         if n < POR_MODULO:
@@ -347,7 +417,8 @@ def validar(perguntas, relatorio):
 
     ids = sorted(por_id)
     if ids:
-        faltando = [i for i in range(ids[0], ids[-1] + 1) if i not in por_id]
+        faltando = [i for i in range(ids[0], ids[-1] + 1)
+                    if i not in por_id and i not in IGNORAR]
         if faltando:
             relatorio.aviso(0, "buraco na numeração dos IDs: {} — não quebra "
                                "nada, mas confira se não sumiu pergunta"
@@ -360,44 +431,22 @@ def validar(perguntas, relatorio):
 def embaralhar(perguntas):
     """
     A certa chega sempre em alternativas[0], porque na planilha ela é sempre a
-    coluna 'RESPOSTA CORRETA'. Sem isto o JSON sairia com "correta": 0 em todas
-    as 45 e quem revisa o arquivo veria o gabarito de bandeja.
+    coluna 1. Sem isto o JSON sairia com "correta": 0 em todas as 45 e quem
+    revisa o arquivo veria o gabarito de bandeja.
+
+    As explicações andam na mesma ordem: explicacoes[i] é sempre a de
+    alternativas[i].
 
     Isto é cosmético: o embaralhamento que o jogador vê acontece de novo no
     quiz.js, a cada exibição.
     """
     rng = random.Random(SEMENTE)
     for p in perguntas:
-        alts = p["alternativas"]
-        certa = alts[p["correta"]]
-        ordem = list(range(len(alts)))
+        ordem = list(range(len(p["alternativas"])))
         rng.shuffle(ordem)
-        p["alternativas"] = [alts[i] for i in ordem]
-        p["correta"] = p["alternativas"].index(certa)
-
-
-def preservar_explicacoes(perguntas):
-    """
-    A explicação nasce no gerar-explicacoes.js e é revisada à mão. O casamento
-    é pelo ID da planilha — por isso ele nunca pode ser reciclado nem reordenado.
-    """
-    if not SAIDA.exists():
-        return 0
-    try:
-        antigas = json.loads(SAIDA.read_text(encoding="utf-8"))
-    except (ValueError, OSError):
-        print("AVISO: não consegui ler o perguntas.json atual; as explicações "
-              "existentes não serão preservadas.")
-        return 0
-
-    mapa = {p.get("id"): p.get("explicacao", "") for p in antigas
-            if isinstance(p, dict) and p.get("explicacao")}
-    n = 0
-    for p in perguntas:
-        if p["id"] in mapa:
-            p["explicacao"] = mapa[p["id"]]
-            n += 1
-    return n
+        p["alternativas"] = [p["alternativas"][i] for i in ordem]
+        p["explicacoes"] = [p["explicacoes"][i] for i in ordem]
+        p["correta"] = ordem.index(p["correta"])
 
 
 def main():
@@ -423,7 +472,6 @@ def main():
         return 0
 
     embaralhar(perguntas)
-    mantidas = preservar_explicacoes(perguntas)
 
     SAIDA.write_text(
         json.dumps(perguntas, ensure_ascii=False, indent=2) + "\n",
@@ -436,9 +484,10 @@ def main():
     # mostrando as perguntas antigas.
     empacotar.main()
 
-    print("{} explicação(ões) preservada(s) da rodada anterior.".format(mantidas))
-    print("{} explicação(ões) ainda vazia(s)."
-          .format(sum(1 for p in perguntas if not p["explicacao"])))
+    total = sum(len(p["explicacoes"]) for p in perguntas)
+    vazias = sum(1 for p in perguntas for e in p["explicacoes"] if not e)
+    print("{} de {} explicações preenchidas ({} vazias)."
+          .format(total - vazias, total, vazias))
     return 0
 
 

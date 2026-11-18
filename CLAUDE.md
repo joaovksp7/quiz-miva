@@ -113,23 +113,24 @@ Isso **não** libera a opção "bloco HTML personalizado" do WordPress: os camin
 
 O único arquivo de conteúdo que o site lê. **Nunca** tocar no código de renderização para mudar conteúdo.
 
-**É um arquivo gerado.** Enunciado, alternativas e `correta` vêm do `.pptx` mais o `correcoes.json`, e são reescritos a cada rodada do extrator — editar isso aqui à mão significa perder a correção na próxima geração. A exceção é `explicacao`: ela nasce no `gerar-explicacoes.js`, é revisada e ajustada à mão aqui mesmo, e o extrator a preserva entre rodadas casando pelo número do slide.
+**É um arquivo gerado, por inteiro.** Hoje sai de `scripts/extrair-planilha.py`, que lê a planilha do Google (ID na constante `PLANILHA`) — enunciado, alternativas, `correta` **e as explicações**. Editar o JSON à mão significa perder a mudança na próxima rodada; corrigir uma explicação é corrigir a planilha e rodar o extrator de novo. Pergunta repetida na planilha é bloqueio: a versão que fica é escolhida à mão na constante `IGNORAR` do extrator, com o motivo.
 
 ```json
 [
   {
     "id": 1,
-    "slide": 3,
+    "linha": 3,
     "eixo": "alerta",
     "pergunta": "O que é um evento climático severo?",
     "alternativas": ["...", "...", "...", "..."],
     "correta": 3,
-    "explicacao": "..."
+    "explicacoes": ["...", "...", "", "..."]
   }
 ]
 ```
 
 - `correta` é o **índice** da certa dentro de `alternativas`, não o texto.
+- `explicacoes[i]` é a explicação de `alternativas[i]` — as duas listas são embaralhadas juntas. Depois da resposta o quiz mostra a da alternativa clicada; string vazia = a área não aparece.
 - `slide` fica no arquivo de propósito: quando alguém apontar erro numa pergunta, é por ele que se volta ao original.
 - A ordem das alternativas é embaralhada **na exportação**, para a certa não ficar sempre na mesma posição na leitura humana do JSON. Isso é cosmético — o embaralhamento que o jogador vê acontece de novo na exibição.
 - O JSON sai formatado e legível, porque as explicações são revisadas lendo este arquivo.
@@ -150,7 +151,7 @@ Os eixos são desbalanceados — 11 / 16 / 18. Com 5 por partida, `alerta` só a
 
 **Alternativas.** Embaralhar de novo na hora de exibir.
 
-**Fluxo de resposta.** Clicou numa alternativa: trava as opções, marca a certa e a errada, mostra a explicação, libera o botão de avançar. **Sem confirmar duas vezes.**
+**Fluxo de resposta.** Clicou numa alternativa: trava as opções, marca a certa e a errada, mostra a explicação da alternativa clicada, libera o botão de avançar. **Sem confirmar duas vezes.**
 
 **Pontuação.** Acertos por módulo e total. Sem cronômetro e sem penalidade por erro — o objetivo é aprender, não competir.
 
@@ -308,7 +309,7 @@ Revisão de digitação geral também pendente: acento faltando ("Lideres comuni
 
 **Técnicas:**
 
-- **As 45 explicações estão vazias.** Falta a chave de API para rodar o `gerar-explicacoes.js`. O quiz já lida com isso: quando `explicacao` está vazia, a área simplesmente não aparece e o veredito de certo/errado continua
+- **Explicações vêm da planilha, uma por alternativa (2026-11-18): 162 de 178 preenchidas.** Faltam a da certa nas perguntas 1–5, 7–11, 27 e 38–41 (IDs da planilha) e as duas do V/F. Quem acerta essas vê só o veredito. Ainda pedem revisão na planilha: palavras partidas nas explicações das perguntas 12–21 ("profis sionais", "evacua ção", "mos trafestas"…), explicação copiada entre duas alternativas na 23, explicação da 6 longa demais para o celular
 - Falta um olho humano num **celular de verdade**. O layout foi conferido em Chrome headless a 1440x900 e 360x780 (card alinhado com a arte, sem rolagem horizontal, nada transbordando), mas toque, rolagem e leitura ao sol são outra história
 - Hospedagem do estático + altura responsiva do iframe no WordPress
 - O repositório ainda não tem nenhum commit

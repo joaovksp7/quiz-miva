@@ -20,7 +20,7 @@ import json
 import sys
 from pathlib import Path
 
-RAIZ = Path(__file__).resolve().parent.parent
+RAIZ = Path(__file__).resolve().parent.parent / "public_html"
 PERGUNTAS_JSON = RAIZ / "perguntas.json"
 PERGUNTAS_JS = RAIZ / "perguntas.js"
 FONTES_CSS = RAIZ / "fontes.css"
